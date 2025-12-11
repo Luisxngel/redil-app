@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
 import '../bloc/members_bloc.dart';
@@ -43,6 +44,19 @@ class _MemberFormPageState extends State<MemberFormPage> {
       _status = m.status;
       _civilStatus = m.civilStatus ?? CivilStatus.single;
       _dateOfBirth = m.dateOfBirth;
+      _civilStatus = m.civilStatus ?? CivilStatus.single;
+      _dateOfBirth = m.dateOfBirth;
+    } else {
+      // Explicitly clear for new member to avoid any retained state issues
+      _firstNameController.clear();
+      _lastNameController.clear();
+      _phoneController.clear();
+      _addressController.clear();
+      _notesController.clear();
+      _role = MemberRole.member;
+      _status = MemberStatus.active;
+      _civilStatus = CivilStatus.single;
+      _dateOfBirth = null;
     }
   }
 
@@ -58,8 +72,12 @@ class _MemberFormPageState extends State<MemberFormPage> {
 
   void _save() {
     if (_formKey.currentState?.validate() ?? false) {
+      // GENERATE UUID V4 for new members (String)
+      // If editing, keep existing ID.
+      final String id = widget.member?.id ?? const Uuid().v4();
+      
       final member = Member(
-        id: widget.member?.id, // Preserve ID if editing
+        id: id,
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         phone: _phoneController.text.trim(),
@@ -69,10 +87,13 @@ class _MemberFormPageState extends State<MemberFormPage> {
         civilStatus: _civilStatus,
         dateOfBirth: _dateOfBirth,
         notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-        createdAt: widget.member?.createdAt ?? DateTime.now(), // Preserve creation date
+        createdAt: widget.member?.createdAt ?? DateTime.now(), 
         updatedAt: DateTime.now(),
+        isDeleted: widget.member?.isDeleted ?? false,
       );
       
+      print('DEBUG: Guardando Miembro con ID: $id (Es uuid: ${widget.member?.id == null})');
+
       context.read<MembersBloc>().add(MembersEvent.addMember(member));
     }
   }

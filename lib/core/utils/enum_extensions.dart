@@ -13,6 +13,19 @@ extension MemberRoleX on MemberRole {
         return 'Invitado';
     }
   }
+
+  String get labelPlural {
+    switch (this) {
+      case MemberRole.leader:
+        return 'Líderes';
+      case MemberRole.assistant:
+        return 'Asistentes';
+      case MemberRole.member:
+        return 'Miembros';
+      case MemberRole.guest:
+        return 'Invitados';
+    }
+  }
 }
 
 extension MemberStatusX on MemberStatus {

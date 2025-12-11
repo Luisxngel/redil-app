@@ -36,9 +36,7 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, Member?>> getMemberById(String id) async {
     try {
-      final intId = int.tryParse(id);
-      if (intId == null) return const Right(null);
-
+      final intId = fastHash(id); // Use fastHash
       final model = await _isar.memberModels.get(intId);
       return Right(model?.toEntity());
     } catch (e) {
@@ -62,9 +60,9 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> hardDeleteMember(String id) async {
     try {
-      final intId = int.parse(id);
+      final intId = fastHash(id);
       await _isar.writeTxn(() async {
-        await _isar.memberModels.delete(intId); // Hard Delete
+        await _isar.memberModels.delete(intId); 
       });
       return const Right(null);
     } catch (e) {
@@ -75,16 +73,23 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> deleteMember(String id) async {
     try {
-      final intId = int.tryParse(id);
-      if (intId == null) {
-        return const Left(DatabaseFailure('Invalid ID format'));
-      }
-
+      final intId = fastHash(id);
       await _isar.writeTxn(() async {
         final member = await _isar.memberModels.get(intId);
         if (member != null) {
-          member.isDeleted = true;
-          await _isar.memberModels.put(member); // Soft Delete
+          // Since Isar objects are immutable in our new model (final fields), 
+          // we must create a copy with isDeleted = true.
+          // However, Isar's put() replaces the object with the same ID.
+          // We can use the constructor to copy fields.
+          // OR usually Isar objects are mutable. 
+          // But I made fields final in MemberModel per request.
+          // So I have to create a new instance.
+          
+          member.isDeleted = true; // Wait, I can't set if final.
+          // Ah, I set isDeleted to NOT final in my rewrite logic just in case?
+          // Let's check MemberModel.
+          // YES, I set `bool isDeleted` (no final). So this works.
+          await _isar.memberModels.put(member); 
         }
       });
       return const Right(null);
@@ -96,12 +101,12 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> restoreMember(String id) async {
     try {
-      final intId = int.parse(id);
+      final intId = fastHash(id);
       await _isar.writeTxn(() async {
         final member = await _isar.memberModels.get(intId);
         if (member != null) {
-          member.isDeleted = false;
-          await _isar.memberModels.put(member); // Restore
+          member.isDeleted = false; // Mutable field
+          await _isar.memberModels.put(member); 
         }
       });
       return const Right(null);
@@ -130,6 +135,18 @@ class MemberRepositoryImpl implements MemberRepository {
       return Right(models.map((e) => e.toEntity()).toList());
     } catch (e) {
       return Left(DatabaseFailure('Error searching members: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> wipeData() async {
+    try {
+      await _isar.writeTxn(() async {
+        await _isar.memberModels.clear();
+      });
+      return const Right(null);
+    } catch (e) {
+      return Left(DatabaseFailure(e.toString()));
     }
   }
 }

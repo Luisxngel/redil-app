@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:grouped_list/grouped_list.dart';
+import '../../domain/entities/member.dart';
+import '../../../../core/utils/enum_extensions.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../bloc/members_bloc.dart';
 import '../bloc/members_event.dart';
 import '../bloc/members_state.dart';
@@ -29,7 +33,13 @@ class _MembersPageState extends State<MembersPage> {
           IconButton(
             icon: const Icon(Icons.recycling),
             tooltip: 'Papelera',
-            onPressed: () => context.push('/trash'),
+            onPressed: () {
+              context.push('/trash').then((_) {
+                if (context.mounted) {
+                  context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+                }
+              });
+            },
           ),
           IconButton(
             icon: const Icon(Icons.sort),
@@ -68,12 +78,61 @@ class _MembersPageState extends State<MembersPage> {
               if (members.isEmpty) {
                 return const Center(child: Text('No hay miembros registrados'));
               }
-              return ListView.separated(
-                itemCount: members.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 4),
+              // Group members by Role
+              final Map<MemberRole, List<Member>> groupedMembers = {};
+              for (var member in members) {
+                if (!groupedMembers.containsKey(member.role)) {
+                  groupedMembers[member.role] = [];
+                }
+                groupedMembers[member.role]!.add(member);
+              }
+
+              // Sort roles by priority (Enum index: Leader=0 > Assistant=1 > Member=2 > Guest=3)
+              final sortedRoles = groupedMembers.keys.toList()
+                ..sort((a, b) => a.index.compareTo(b.index));
+
+              return ListView.builder(
+                itemCount: sortedRoles.length,
                 itemBuilder: (context, index) {
-                  final member = members[index];
-                  return MemberTile(member: member);
+                  final role = sortedRoles[index];
+                  final roleMembers = groupedMembers[role]!;
+                  
+                  // Sort members alphabetically within the role
+                  roleMembers.sort((a, b) => a.firstName.compareTo(b.firstName));
+                  
+                  final count = roleMembers.length;
+                  final isExpandedByDefault = role == MemberRole.leader || role == MemberRole.assistant;
+
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      side: BorderSide(color: Theme.of(context).primaryColor.withOpacity(0.1)),
+                    ),
+                    child: Theme(
+                       // Remove divider lines from ExpansionTile
+                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                      child: ExpansionTile(
+                        initiallyExpanded: isExpandedByDefault,
+                        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.02),
+                        collapsedBackgroundColor: Theme.of(context).primaryColor.withOpacity(0.05),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        title: Text(
+                          '${role.labelPlural.toUpperCase()} ($count)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        children: roleMembers.map((member) => Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                          child: MemberTile(member: member),
+                        )).toList(),
+                      ),
+                    ),
+                  );
                 },
               );
             },
@@ -84,7 +143,13 @@ class _MembersPageState extends State<MembersPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/add'),
+        onPressed: () {
+          context.push('/add', extra: null).then((_) {
+            if (context.mounted) {
+              context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+            }
+          });
+        },
         child: const Icon(Icons.add),
       ),
     );

@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../bloc/members_bloc.dart';
+import '../bloc/members_event.dart';
 import 'whatsapp_message_dialog.dart';
 
 class MemberTile extends StatelessWidget {
@@ -44,21 +47,55 @@ class MemberTile extends StatelessWidget {
           children: [
              _buildStatusIcon(member.status),
              const SizedBox(width: 8),
-             IconButton(
-               icon: const Icon(Icons.edit, color: Colors.grey),
-               onPressed: () => context.push('/edit', extra: member),
-             ),
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.grey),
+                onPressed: () {
+                  context.push('/edit', extra: member).then((_) {
+                    if (context.mounted) {
+                      context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+                    }
+                  });
+                },
+              ),
              IconButton(
                icon: const Icon(Icons.chat, color: Colors.green),
-               onPressed: () {
-                 showDialog(
-                   context: context,
-                   builder: (_) => WhatsAppMessageDialog(member: member),
-                 );
-               },
-             ),
-          ],
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => WhatsAppMessageDialog(member: member),
+                  );
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                onPressed: () => _confirmDelete(context),
+              ),
+            ],
+          ),
         ),
+    );
+  }
+
+  void _confirmDelete(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('¿Enviar a papelera a ${member.firstName}?'),
+        content: const Text('Podrás restaurarlo luego desde la papelera.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<MembersBloc>().add(MembersEvent.deleteMember(member.id!));
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('ELIMINAR'),
+          ),
+        ],
       ),
     );
   }

@@ -24,4 +24,6 @@ abstract class MemberRepository {
   Future<Either<Failure, void>> hardDeleteMember(String id);
   
   Future<Either<Failure, void>> restoreMember(String id);
+
+  Future<Either<Failure, void>> wipeData();
 }

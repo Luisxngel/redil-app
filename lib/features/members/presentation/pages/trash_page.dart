@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/member.dart';
 import '../bloc/members_bloc.dart';
@@ -27,6 +28,12 @@ class _TrashPageState extends State<TrashPage> {
         title: const Text('Papelera de Reciclaje'),
         backgroundColor: Colors.grey[800],
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report, color: Colors.orange),
+            onPressed: () => _confirmWipe(context),
+          ),
+        ],
       ),
       body: BlocConsumer<MembersBloc, MembersState>(
         listener: (context, state) {
@@ -35,6 +42,9 @@ class _TrashPageState extends State<TrashPage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(msg), backgroundColor: Colors.green),
               );
+              if (msg.contains('BORRADA')) {
+                context.go('/'); // Return to root and it will reload empty list
+              }
             },
             error: (msg) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -121,6 +131,33 @@ class _TrashMemberTile extends StatelessWidget {
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('ELIMINAR'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+extension _TrashPageStateHelpers on _TrashPageState {
+    void _confirmWipe(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('⚠️ PELIGRO: BORRAR TODO ⚠️', style: TextStyle(color: Colors.red)),
+        content: const Text('¿Estás seguro de ELIMINAR TODA LA BASE DE DATOS?\n\nEsta acción es irreversible y borrará TODOS los usuarios (activos y eliminados).'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('CANCELAR'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              context.read<MembersBloc>().add(const MembersEvent.wipeAllData());
+              // Force navigation home and reload after a short delay or rely on Bloc listener (ActionSuccess)
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red, backgroundColor: Colors.yellow[100]),
+            child: const Text('BORRAR TODO'),
           ),
         ],
       ),

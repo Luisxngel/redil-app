@@ -12,5 +12,6 @@ class MembersEvent with _$MembersEvent {
   const factory MembersEvent.loadTrash() = LoadTrash;
   const factory MembersEvent.restoreMember(String id) = RestoreMember;
   const factory MembersEvent.hardDeleteMember(String id) = HardDeleteMember;
+  const factory MembersEvent.wipeAllData() = WipeAllData;
   const factory MembersEvent.filterByStatus(MemberStatus? status) = FilterByStatus;
 }

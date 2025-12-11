@@ -30,8 +30,20 @@ class MembersBloc extends Bloc<MembersEvent, MembersState> {
     on<LoadTrash>(_onLoadTrash);
     on<RestoreMember>(_onRestoreMember);
     on<HardDeleteMember>(_onHardDeleteMember);
+    on<WipeAllData>(_onWipeAllData);
   }
 
+  Future<void> _onWipeAllData(
+    WipeAllData event,
+    Emitter<MembersState> emit,
+  ) async {
+    final result = await _repository.wipeData();
+    result.fold(
+      (failure) => emit(MembersState.error(failure.message)),
+      (_) => emit(const MembersState.actionSuccess('BASE DE DATOS BORRADA')),
+    );
+  }
+  
   Future<void> _onLoadTrash(
     LoadTrash event,
     Emitter<MembersState> emit,

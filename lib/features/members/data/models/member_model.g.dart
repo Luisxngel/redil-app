@@ -42,45 +42,50 @@ const MemberModelSchema = CollectionSchema(
       name: r'firstName',
       type: IsarType.string,
     ),
-    r'isDeleted': PropertySchema(
+    r'id': PropertySchema(
       id: 5,
+      name: r'id',
+      type: IsarType.string,
+    ),
+    r'isDeleted': PropertySchema(
+      id: 6,
       name: r'isDeleted',
       type: IsarType.bool,
     ),
     r'lastAttendanceDate': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'lastAttendanceDate',
       type: IsarType.dateTime,
     ),
     r'lastName': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'lastName',
       type: IsarType.string,
     ),
     r'notes': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'notes',
       type: IsarType.string,
     ),
     r'phone': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'phone',
       type: IsarType.string,
     ),
     r'role': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'role',
       type: IsarType.byte,
       enumMap: _MemberModelroleEnumValueMap,
     ),
     r'status': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MemberModelstatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -89,8 +94,21 @@ const MemberModelSchema = CollectionSchema(
   serialize: _memberModelSerialize,
   deserialize: _memberModelDeserialize,
   deserializeProp: _memberModelDeserializeProp,
-  idName: r'id',
+  idName: r'isarId',
   indexes: {
+    r'id': IndexSchema(
+      id: -3268401673993471357,
+      name: r'id',
+      unique: true,
+      replace: true,
+      properties: [
+        IndexPropertySchema(
+          name: r'id',
+          type: IndexType.hash,
+          caseSensitive: true,
+        )
+      ],
+    ),
     r'phone': IndexSchema(
       id: -6308098324157559207,
       name: r'phone',
@@ -126,6 +144,7 @@ int _memberModelEstimateSize(
     }
   }
   bytesCount += 3 + object.firstName.length * 3;
+  bytesCount += 3 + object.id.length * 3;
   bytesCount += 3 + object.lastName.length * 3;
   {
     final value = object.notes;
@@ -148,14 +167,15 @@ void _memberModelSerialize(
   writer.writeDateTime(offsets[2], object.createdAt);
   writer.writeDateTime(offsets[3], object.dateOfBirth);
   writer.writeString(offsets[4], object.firstName);
-  writer.writeBool(offsets[5], object.isDeleted);
-  writer.writeDateTime(offsets[6], object.lastAttendanceDate);
-  writer.writeString(offsets[7], object.lastName);
-  writer.writeString(offsets[8], object.notes);
-  writer.writeString(offsets[9], object.phone);
-  writer.writeByte(offsets[10], object.role.index);
-  writer.writeByte(offsets[11], object.status.index);
-  writer.writeDateTime(offsets[12], object.updatedAt);
+  writer.writeString(offsets[5], object.id);
+  writer.writeBool(offsets[6], object.isDeleted);
+  writer.writeDateTime(offsets[7], object.lastAttendanceDate);
+  writer.writeString(offsets[8], object.lastName);
+  writer.writeString(offsets[9], object.notes);
+  writer.writeString(offsets[10], object.phone);
+  writer.writeByte(offsets[11], object.role.index);
+  writer.writeByte(offsets[12], object.status.index);
+  writer.writeDateTime(offsets[13], object.updatedAt);
 }
 
 MemberModel _memberModelDeserialize(
@@ -164,25 +184,25 @@ MemberModel _memberModelDeserialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  final object = MemberModel();
-  object.address = reader.readStringOrNull(offsets[0]);
-  object.civilStatusIndex = reader.readLongOrNull(offsets[1]);
-  object.createdAt = reader.readDateTime(offsets[2]);
-  object.dateOfBirth = reader.readDateTimeOrNull(offsets[3]);
-  object.firstName = reader.readString(offsets[4]);
-  object.id = id;
-  object.isDeleted = reader.readBool(offsets[5]);
-  object.lastAttendanceDate = reader.readDateTimeOrNull(offsets[6]);
-  object.lastName = reader.readString(offsets[7]);
-  object.notes = reader.readStringOrNull(offsets[8]);
-  object.phone = reader.readString(offsets[9]);
-  object.role =
-      _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[10])] ??
-          MemberRole.leader;
-  object.status =
-      _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[11])] ??
-          MemberStatus.active;
-  object.updatedAt = reader.readDateTimeOrNull(offsets[12]);
+  final object = MemberModel(
+    address: reader.readStringOrNull(offsets[0]),
+    civilStatusIndex: reader.readLongOrNull(offsets[1]),
+    createdAt: reader.readDateTime(offsets[2]),
+    dateOfBirth: reader.readDateTimeOrNull(offsets[3]),
+    firstName: reader.readString(offsets[4]),
+    id: reader.readString(offsets[5]),
+    isDeleted: reader.readBoolOrNull(offsets[6]) ?? false,
+    lastAttendanceDate: reader.readDateTimeOrNull(offsets[7]),
+    lastName: reader.readString(offsets[8]),
+    notes: reader.readStringOrNull(offsets[9]),
+    phone: reader.readString(offsets[10]),
+    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[11])] ??
+        MemberRole.leader,
+    status:
+        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[12])] ??
+            MemberStatus.active,
+    updatedAt: reader.readDateTimeOrNull(offsets[13]),
+  );
   return object;
 }
 
@@ -204,22 +224,24 @@ P _memberModelDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 7:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 8:
-      return (reader.readStringOrNull(offset)) as P;
-    case 9:
       return (reader.readString(offset)) as P;
+    case 9:
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
+      return (reader.readString(offset)) as P;
+    case 11:
       return (_MemberModelroleValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberRole.leader) as P;
-    case 11:
+    case 12:
       return (_MemberModelstatusValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberStatus.active) as P;
-    case 12:
+    case 13:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -250,7 +272,7 @@ const _MemberModelstatusValueEnumMap = {
 };
 
 Id _memberModelGetId(MemberModel object) {
-  return object.id;
+  return object.isarId;
 }
 
 List<IsarLinkBase<dynamic>> _memberModelGetLinks(MemberModel object) {
@@ -258,11 +280,61 @@ List<IsarLinkBase<dynamic>> _memberModelGetLinks(MemberModel object) {
 }
 
 void _memberModelAttach(
-    IsarCollection<dynamic> col, Id id, MemberModel object) {
-  object.id = id;
-}
+    IsarCollection<dynamic> col, Id id, MemberModel object) {}
 
 extension MemberModelByIndex on IsarCollection<MemberModel> {
+  Future<MemberModel?> getById(String id) {
+    return getByIndex(r'id', [id]);
+  }
+
+  MemberModel? getByIdSync(String id) {
+    return getByIndexSync(r'id', [id]);
+  }
+
+  Future<bool> deleteById(String id) {
+    return deleteByIndex(r'id', [id]);
+  }
+
+  bool deleteByIdSync(String id) {
+    return deleteByIndexSync(r'id', [id]);
+  }
+
+  Future<List<MemberModel?>> getAllById(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return getAllByIndex(r'id', values);
+  }
+
+  List<MemberModel?> getAllByIdSync(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return getAllByIndexSync(r'id', values);
+  }
+
+  Future<int> deleteAllById(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return deleteAllByIndex(r'id', values);
+  }
+
+  int deleteAllByIdSync(List<String> idValues) {
+    final values = idValues.map((e) => [e]).toList();
+    return deleteAllByIndexSync(r'id', values);
+  }
+
+  Future<Id> putById(MemberModel object) {
+    return putByIndex(r'id', object);
+  }
+
+  Id putByIdSync(MemberModel object, {bool saveLinks = true}) {
+    return putByIndexSync(r'id', object, saveLinks: saveLinks);
+  }
+
+  Future<List<Id>> putAllById(List<MemberModel> objects) {
+    return putAllByIndex(r'id', objects);
+  }
+
+  List<Id> putAllByIdSync(List<MemberModel> objects, {bool saveLinks = true}) {
+    return putAllByIndexSync(r'id', objects, saveLinks: saveLinks);
+  }
+
   Future<MemberModel?> getByPhone(String phone) {
     return getByIndex(r'phone', [phone]);
   }
@@ -319,7 +391,7 @@ extension MemberModelByIndex on IsarCollection<MemberModel> {
 
 extension MemberModelQueryWhereSort
     on QueryBuilder<MemberModel, MemberModel, QWhere> {
-  QueryBuilder<MemberModel, MemberModel, QAfterWhere> anyId() {
+  QueryBuilder<MemberModel, MemberModel, QAfterWhere> anyIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(const IdWhereClause.any());
     });
@@ -328,69 +400,117 @@ extension MemberModelQueryWhereSort
 
 extension MemberModelQueryWhere
     on QueryBuilder<MemberModel, MemberModel, QWhereClause> {
-  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idEqualTo(Id id) {
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> isarIdEqualTo(
+      Id isarId) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
-        lower: id,
-        upper: id,
+        lower: isarId,
+        upper: isarId,
       ));
     });
   }
 
-  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idNotEqualTo(
-      Id id) {
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> isarIdNotEqualTo(
+      Id isarId) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
             .addWhereClause(
-              IdWhereClause.lessThan(upper: id, includeUpper: false),
+              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
             )
             .addWhereClause(
-              IdWhereClause.greaterThan(lower: id, includeLower: false),
+              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
             );
       } else {
         return query
             .addWhereClause(
-              IdWhereClause.greaterThan(lower: id, includeLower: false),
+              IdWhereClause.greaterThan(lower: isarId, includeLower: false),
             )
             .addWhereClause(
-              IdWhereClause.lessThan(upper: id, includeUpper: false),
+              IdWhereClause.lessThan(upper: isarId, includeUpper: false),
             );
       }
     });
   }
 
-  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idGreaterThan(Id id,
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> isarIdGreaterThan(
+      Id isarId,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IdWhereClause.greaterThan(lower: id, includeLower: include),
+        IdWhereClause.greaterThan(lower: isarId, includeLower: include),
       );
     });
   }
 
-  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idLessThan(Id id,
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> isarIdLessThan(
+      Id isarId,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
-        IdWhereClause.lessThan(upper: id, includeUpper: include),
+        IdWhereClause.lessThan(upper: isarId, includeUpper: include),
       );
     });
   }
 
-  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idBetween(
-    Id lowerId,
-    Id upperId, {
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> isarIdBetween(
+    Id lowerIsarId,
+    Id upperIsarId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
-        lower: lowerId,
+        lower: lowerIsarId,
         includeLower: includeLower,
-        upper: upperId,
+        upper: upperIsarId,
         includeUpper: includeUpper,
       ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idEqualTo(
+      String id) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IndexWhereClause.equalTo(
+        indexName: r'id',
+        value: [id],
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterWhereClause> idNotEqualTo(
+      String id) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [],
+              upper: [id],
+              includeUpper: false,
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [id],
+              includeLower: false,
+              upper: [],
+            ));
+      } else {
+        return query
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [id],
+              includeLower: false,
+              upper: [],
+            ))
+            .addWhereClause(IndexWhereClause.between(
+              indexName: r'id',
+              lower: [],
+              upper: [id],
+              includeUpper: false,
+            ));
+      }
     });
   }
 
@@ -935,46 +1055,54 @@ extension MemberModelQueryFilter
   }
 
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idEqualTo(
-      Id value) {
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idGreaterThan(
-    Id value, {
+    String value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'id',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idLessThan(
-    Id value, {
+    String value, {
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'id',
         value: value,
+        caseSensitive: caseSensitive,
       ));
     });
   }
 
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idBetween(
-    Id lower,
-    Id upper, {
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -983,6 +1111,75 @@ extension MemberModelQueryFilter
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'id',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'id',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> idIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'id',
+        value: '',
       ));
     });
   }
@@ -993,6 +1190,60 @@ extension MemberModelQueryFilter
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isDeleted',
         value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> isarIdEqualTo(
+      Id value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      isarIdGreaterThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> isarIdLessThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'isarId',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> isarIdBetween(
+    Id lower,
+    Id upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'isarId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1739,6 +1990,18 @@ extension MemberModelQuerySortBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isDeleted', Sort.asc);
@@ -1926,6 +2189,18 @@ extension MemberModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByIsarId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isarId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByIsarIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isarId', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy>
       thenByLastAttendanceDate() {
     return QueryBuilder.apply(this, (query) {
@@ -2048,6 +2323,13 @@ extension MemberModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QDistinct> distinctById(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'id', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByIsDeleted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isDeleted');
@@ -2103,9 +2385,9 @@ extension MemberModelQueryWhereDistinct
 
 extension MemberModelQueryProperty
     on QueryBuilder<MemberModel, MemberModel, QQueryProperty> {
-  QueryBuilder<MemberModel, int, QQueryOperations> idProperty() {
+  QueryBuilder<MemberModel, int, QQueryOperations> isarIdProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'id');
+      return query.addPropertyName(r'isarId');
     });
   }
 
@@ -2136,6 +2418,12 @@ extension MemberModelQueryProperty
   QueryBuilder<MemberModel, String, QQueryOperations> firstNameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'firstName');
+    });
+  }
+
+  QueryBuilder<MemberModel, String, QQueryOperations> idProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'id');
     });
   }
 

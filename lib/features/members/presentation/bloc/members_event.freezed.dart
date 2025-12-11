@@ -25,6 +25,7 @@ mixin _$MembersEvent {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) =>
       throw _privateConstructorUsedError;
@@ -37,6 +38,7 @@ mixin _$MembersEvent {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) =>
       throw _privateConstructorUsedError;
@@ -49,6 +51,7 @@ mixin _$MembersEvent {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) =>
@@ -62,6 +65,7 @@ mixin _$MembersEvent {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) =>
       throw _privateConstructorUsedError;
@@ -74,6 +78,7 @@ mixin _$MembersEvent {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) =>
       throw _privateConstructorUsedError;
@@ -86,6 +91,7 @@ mixin _$MembersEvent {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) =>
@@ -155,6 +161,7 @@ class _$LoadMembersImpl implements LoadMembers {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return loadMembers();
@@ -170,6 +177,7 @@ class _$LoadMembersImpl implements LoadMembers {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return loadMembers?.call();
@@ -185,6 +193,7 @@ class _$LoadMembersImpl implements LoadMembers {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -204,6 +213,7 @@ class _$LoadMembersImpl implements LoadMembers {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return loadMembers(this);
@@ -219,6 +229,7 @@ class _$LoadMembersImpl implements LoadMembers {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return loadMembers?.call(this);
@@ -234,6 +245,7 @@ class _$LoadMembersImpl implements LoadMembers {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -319,6 +331,7 @@ class _$AddMemberImpl implements AddMember {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return addMember(member);
@@ -334,6 +347,7 @@ class _$AddMemberImpl implements AddMember {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return addMember?.call(member);
@@ -349,6 +363,7 @@ class _$AddMemberImpl implements AddMember {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -368,6 +383,7 @@ class _$AddMemberImpl implements AddMember {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return addMember(this);
@@ -383,6 +399,7 @@ class _$AddMemberImpl implements AddMember {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return addMember?.call(this);
@@ -398,6 +415,7 @@ class _$AddMemberImpl implements AddMember {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -488,6 +506,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return deleteMember(id);
@@ -503,6 +522,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return deleteMember?.call(id);
@@ -518,6 +538,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -537,6 +558,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return deleteMember(this);
@@ -552,6 +574,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return deleteMember?.call(this);
@@ -567,6 +590,7 @@ class _$DeleteMemberImpl implements DeleteMember {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -657,6 +681,7 @@ class _$SearchMembersImpl implements SearchMembers {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return searchMembers(query);
@@ -672,6 +697,7 @@ class _$SearchMembersImpl implements SearchMembers {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return searchMembers?.call(query);
@@ -687,6 +713,7 @@ class _$SearchMembersImpl implements SearchMembers {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -706,6 +733,7 @@ class _$SearchMembersImpl implements SearchMembers {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return searchMembers(this);
@@ -721,6 +749,7 @@ class _$SearchMembersImpl implements SearchMembers {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return searchMembers?.call(this);
@@ -736,6 +765,7 @@ class _$SearchMembersImpl implements SearchMembers {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -800,6 +830,7 @@ class _$LoadTrashImpl implements LoadTrash {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return loadTrash();
@@ -815,6 +846,7 @@ class _$LoadTrashImpl implements LoadTrash {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return loadTrash?.call();
@@ -830,6 +862,7 @@ class _$LoadTrashImpl implements LoadTrash {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -849,6 +882,7 @@ class _$LoadTrashImpl implements LoadTrash {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return loadTrash(this);
@@ -864,6 +898,7 @@ class _$LoadTrashImpl implements LoadTrash {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return loadTrash?.call(this);
@@ -879,6 +914,7 @@ class _$LoadTrashImpl implements LoadTrash {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -964,6 +1000,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return restoreMember(id);
@@ -979,6 +1016,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return restoreMember?.call(id);
@@ -994,6 +1032,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -1013,6 +1052,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return restoreMember(this);
@@ -1028,6 +1068,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return restoreMember?.call(this);
@@ -1043,6 +1084,7 @@ class _$RestoreMemberImpl implements RestoreMember {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -1134,6 +1176,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return hardDeleteMember(id);
@@ -1149,6 +1192,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return hardDeleteMember?.call(id);
@@ -1164,6 +1208,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -1183,6 +1228,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return hardDeleteMember(this);
@@ -1198,6 +1244,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return hardDeleteMember?.call(this);
@@ -1213,6 +1260,7 @@ class _$HardDeleteMemberImpl implements HardDeleteMember {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -1230,6 +1278,150 @@ abstract class HardDeleteMember implements MembersEvent {
   @JsonKey(ignore: true)
   _$$HardDeleteMemberImplCopyWith<_$HardDeleteMemberImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$WipeAllDataImplCopyWith<$Res> {
+  factory _$$WipeAllDataImplCopyWith(
+          _$WipeAllDataImpl value, $Res Function(_$WipeAllDataImpl) then) =
+      __$$WipeAllDataImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$WipeAllDataImplCopyWithImpl<$Res>
+    extends _$MembersEventCopyWithImpl<$Res, _$WipeAllDataImpl>
+    implements _$$WipeAllDataImplCopyWith<$Res> {
+  __$$WipeAllDataImplCopyWithImpl(
+      _$WipeAllDataImpl _value, $Res Function(_$WipeAllDataImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$WipeAllDataImpl implements WipeAllData {
+  const _$WipeAllDataImpl();
+
+  @override
+  String toString() {
+    return 'MembersEvent.wipeAllData()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$WipeAllDataImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadMembers,
+    required TResult Function(Member member) addMember,
+    required TResult Function(String id) deleteMember,
+    required TResult Function(String query) searchMembers,
+    required TResult Function() loadTrash,
+    required TResult Function(String id) restoreMember,
+    required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
+    required TResult Function(MemberStatus? status) filterByStatus,
+  }) {
+    return wipeAllData();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadMembers,
+    TResult? Function(Member member)? addMember,
+    TResult? Function(String id)? deleteMember,
+    TResult? Function(String query)? searchMembers,
+    TResult? Function()? loadTrash,
+    TResult? Function(String id)? restoreMember,
+    TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
+    TResult? Function(MemberStatus? status)? filterByStatus,
+  }) {
+    return wipeAllData?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadMembers,
+    TResult Function(Member member)? addMember,
+    TResult Function(String id)? deleteMember,
+    TResult Function(String query)? searchMembers,
+    TResult Function()? loadTrash,
+    TResult Function(String id)? restoreMember,
+    TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
+    TResult Function(MemberStatus? status)? filterByStatus,
+    required TResult orElse(),
+  }) {
+    if (wipeAllData != null) {
+      return wipeAllData();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadMembers value) loadMembers,
+    required TResult Function(AddMember value) addMember,
+    required TResult Function(DeleteMember value) deleteMember,
+    required TResult Function(SearchMembers value) searchMembers,
+    required TResult Function(LoadTrash value) loadTrash,
+    required TResult Function(RestoreMember value) restoreMember,
+    required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
+    required TResult Function(FilterByStatus value) filterByStatus,
+  }) {
+    return wipeAllData(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadMembers value)? loadMembers,
+    TResult? Function(AddMember value)? addMember,
+    TResult? Function(DeleteMember value)? deleteMember,
+    TResult? Function(SearchMembers value)? searchMembers,
+    TResult? Function(LoadTrash value)? loadTrash,
+    TResult? Function(RestoreMember value)? restoreMember,
+    TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
+    TResult? Function(FilterByStatus value)? filterByStatus,
+  }) {
+    return wipeAllData?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadMembers value)? loadMembers,
+    TResult Function(AddMember value)? addMember,
+    TResult Function(DeleteMember value)? deleteMember,
+    TResult Function(SearchMembers value)? searchMembers,
+    TResult Function(LoadTrash value)? loadTrash,
+    TResult Function(RestoreMember value)? restoreMember,
+    TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
+    TResult Function(FilterByStatus value)? filterByStatus,
+    required TResult orElse(),
+  }) {
+    if (wipeAllData != null) {
+      return wipeAllData(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class WipeAllData implements MembersEvent {
+  const factory WipeAllData() = _$WipeAllDataImpl;
 }
 
 /// @nodoc
@@ -1304,6 +1496,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     required TResult Function() loadTrash,
     required TResult Function(String id) restoreMember,
     required TResult Function(String id) hardDeleteMember,
+    required TResult Function() wipeAllData,
     required TResult Function(MemberStatus? status) filterByStatus,
   }) {
     return filterByStatus(status);
@@ -1319,6 +1512,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     TResult? Function()? loadTrash,
     TResult? Function(String id)? restoreMember,
     TResult? Function(String id)? hardDeleteMember,
+    TResult? Function()? wipeAllData,
     TResult? Function(MemberStatus? status)? filterByStatus,
   }) {
     return filterByStatus?.call(status);
@@ -1334,6 +1528,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     TResult Function()? loadTrash,
     TResult Function(String id)? restoreMember,
     TResult Function(String id)? hardDeleteMember,
+    TResult Function()? wipeAllData,
     TResult Function(MemberStatus? status)? filterByStatus,
     required TResult orElse(),
   }) {
@@ -1353,6 +1548,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     required TResult Function(LoadTrash value) loadTrash,
     required TResult Function(RestoreMember value) restoreMember,
     required TResult Function(HardDeleteMember value) hardDeleteMember,
+    required TResult Function(WipeAllData value) wipeAllData,
     required TResult Function(FilterByStatus value) filterByStatus,
   }) {
     return filterByStatus(this);
@@ -1368,6 +1564,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     TResult? Function(LoadTrash value)? loadTrash,
     TResult? Function(RestoreMember value)? restoreMember,
     TResult? Function(HardDeleteMember value)? hardDeleteMember,
+    TResult? Function(WipeAllData value)? wipeAllData,
     TResult? Function(FilterByStatus value)? filterByStatus,
   }) {
     return filterByStatus?.call(this);
@@ -1383,6 +1580,7 @@ class _$FilterByStatusImpl implements FilterByStatus {
     TResult Function(LoadTrash value)? loadTrash,
     TResult Function(RestoreMember value)? restoreMember,
     TResult Function(HardDeleteMember value)? hardDeleteMember,
+    TResult Function(WipeAllData value)? wipeAllData,
     TResult Function(FilterByStatus value)? filterByStatus,
     required TResult orElse(),
   }) {

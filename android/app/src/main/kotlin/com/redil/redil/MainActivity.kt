@@ -1,0 +1,5 @@
+package com.redil.redil
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

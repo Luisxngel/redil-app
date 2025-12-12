@@ -31,6 +31,13 @@ class _MembersPageState extends State<MembersPage> {
         title: const Text('Miembros'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.event_note),
+            tooltip: 'Asistencia',
+            onPressed: () {
+              context.push('/attendance');
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.recycling),
             tooltip: 'Papelera',
             onPressed: () {

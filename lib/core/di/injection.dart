@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../features/members/data/models/member_model.dart';
+import '../../features/attendance/data/models/attendance_model.dart';
 import 'injection.config.dart';
 
 final getIt = GetIt.instance;
@@ -22,7 +23,7 @@ abstract class IsarModule {
     
     // Open Isar with defined schemas
     return await Isar.open(
-      [MemberModelSchema],
+      [MemberModelSchema, AttendanceModelSchema],
       directory: dir.path,
     );
   }

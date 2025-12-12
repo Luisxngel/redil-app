@@ -5,6 +5,7 @@ import 'package:grouped_list/grouped_list.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../bloc/members_bloc.dart';
 import '../bloc/members_event.dart';
 import '../bloc/members_state.dart';
@@ -31,28 +32,44 @@ class _MembersPageState extends State<MembersPage> {
         title: const Text('Miembros'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.event_note),
-            tooltip: 'Asistencia',
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: 'Notificaciones',
             onPressed: () {
-              context.push('/attendance');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Sin notificaciones nuevas')),
+              );
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.recycling),
-            tooltip: 'Papelera',
-            onPressed: () {
-              context.push('/trash').then((_) {
-                if (context.mounted) {
-                  context.read<MembersBloc>().add(const MembersEvent.loadMembers());
-                }
-              });
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'theme') {
+                _showThemeDialog(context);
+              } else if (value == 'trash') {
+                context.push('/trash').then((_) {
+                  if (context.mounted) {
+                    context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+                  }
+                });
+              }
             },
-          ),
-          IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () {
-              // Implement sorting or filtering dialog
-            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'theme',
+                child: ListTile(
+                  leading: Icon(Icons.palette_outlined),
+                  title: Text('Cambiar Tema'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'trash',
+                child: ListTile(
+                  leading: Icon(Icons.delete_outline, color: Colors.red),
+                  title: Text('Papelera', style: TextStyle(color: Colors.red)),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -158,6 +175,105 @@ class _MembersPageState extends State<MembersPage> {
           });
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Elige un Tema'),
+          content: SingleChildScrollView(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _ThemeCircle(
+                  color: const Color(0xFF00897B),
+                  label: 'Teal',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.teal,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.teal);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: const Color(0xFF1565C0),
+                  label: 'Azul',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.blue,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.blue);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: const Color(0xFF6A1B9A),
+                  label: 'Violeta',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.purple,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.purple);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: Colors.black,
+                  label: 'Dark',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.dark,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.dark);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _ThemeCircle extends StatelessWidget {
+  final Color color;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeCircle({
+    required this.color,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: isSelected ? Border.all(color: Colors.orange, width: 3) : null,
+              boxShadow: [
+                if (isSelected)
+                  BoxShadow(
+                    color: color.withOpacity(0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  )
+              ],
+            ),
+            child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 20) : null,
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 10)),
+        ],
       ),
     );
   }

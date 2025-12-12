@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/theme/app_theme.dart';
+
 import '../bloc/members_bloc.dart';
 import '../bloc/members_event.dart';
 import 'whatsapp_message_dialog.dart';
@@ -30,8 +30,8 @@ class MemberTile extends StatelessWidget {
                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
-            if (_isBirthdayToday(member.dateOfBirth))
-              const Icon(Icons.cake, color: AppTheme.secondaryColor),
+              if (_isBirthdayToday(member.dateOfBirth))
+                Icon(Icons.cake, color: Theme.of(context).colorScheme.secondary),
           ],
         ),
         subtitle: Text(

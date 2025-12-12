@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
@@ -31,7 +32,69 @@ class _DashboardView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Redil Dashboard'),
-        centerTitle: true, 
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            tooltip: 'Notificaciones',
+            onPressed: () {
+              final state = context.read<DashboardBloc>().state;
+              state.maybeWhen(
+                loaded: (_, __, birthdays, ___) {
+                  if (birthdays.isNotEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('🔔 Tienes ${birthdays.length} cumpleaños esta semana. ¡Revisa el radar!'),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        duration: const Duration(seconds: 3),
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Sin notificaciones nuevas')),
+                    );
+                  }
+                },
+                orElse: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Sin notificaciones nuevas')),
+                  );
+                },
+              );
+            },
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'theme') {
+                _showThemeDialog(context);
+              } else if (value == 'trash') {
+                context.push('/trash').then((_) {
+                  if (context.mounted) {
+                    context.read<DashboardBloc>().add(const DashboardEvent.loadDashboardData());
+                  }
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'theme',
+                child: ListTile(
+                  leading: Icon(Icons.palette_outlined),
+                  title: Text('Cambiar Tema'),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'trash',
+                child: ListTile(
+                  leading: Icon(Icons.delete_outline, color: Colors.red),
+                  title: Text('Papelera', style: TextStyle(color: Colors.red)),
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: BlocBuilder<DashboardBloc, DashboardState>(
         builder: (context, state) {
@@ -63,10 +126,9 @@ class _DashboardView extends StatelessWidget {
 
                     // 4. Alerta de Riesgo
                     if (riskMembers.isNotEmpty) ...[
-
                       _buildAttritionList(context, riskMembers),
                     ],
-                    
+
                     if (birthdays.isEmpty && riskMembers.isEmpty)
                       const Center(child: Padding(
                         padding: EdgeInsets.all(20.0),
@@ -122,11 +184,6 @@ class _DashboardView extends StatelessWidget {
           icon: Icons.event_note,
           onTap: () => context.push('/attendance'),
         ),
-        _QuickActionButton(
-          label: 'Papelera',
-          icon: Icons.recycling,
-          onTap: () => context.push('/trash'),
-        ),
       ],
     );
   }
@@ -140,9 +197,8 @@ class _DashboardView extends StatelessWidget {
         itemBuilder: (context, index) {
           final member = members[index];
           final dob = member.dateOfBirth!;
-          // format: 12 Oct
-          final dateStr = DateFormat('d MMM', 'es').format(dob); 
-          
+          final dateStr = DateFormat('d MMM', 'es').format(dob);
+
           return Card(
             margin: const EdgeInsets.only(right: 12),
             child: Container(
@@ -161,8 +217,8 @@ class _DashboardView extends StatelessWidget {
                    ),
                    const SizedBox(height: 4),
                    Text(
-                     '${member.firstName} ${member.lastName}', 
-                     maxLines: 1, 
+                     '${member.firstName} ${member.lastName}',
+                     maxLines: 1,
                      overflow: TextOverflow.ellipsis,
                      textAlign: TextAlign.center,
                    ),
@@ -189,7 +245,7 @@ class _DashboardView extends StatelessWidget {
                 Icon(Icons.warning_amber_rounded, color: Colors.orange.shade800),
                 const SizedBox(width: 8),
                 Text(
-                  'Atención Requerida (3 faltas)',
+                  'Atención Requerida (${members.length})',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange.shade900,
@@ -214,7 +270,7 @@ class _DashboardView extends StatelessWidget {
                   ),
                 ),
                 title: Text('${member.firstName} ${member.lastName}'),
-                subtitle: const Text('Ausente en últimos eventos'),
+                subtitle: const Text('Ausentes en últimos 3 eventos'),
                 trailing: IconButton(
                   icon: const Icon(Icons.chat, color: Colors.green),
                   onPressed: () {
@@ -229,6 +285,60 @@ class _DashboardView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Elige un Tema'),
+          content: SingleChildScrollView(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _ThemeCircle(
+                  color: const Color(0xFF00897B),
+                  label: 'Teal',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.teal,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.teal);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: const Color(0xFF1565C0),
+                  label: 'Azul',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.blue,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.blue);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: const Color(0xFF6A1B9A),
+                  label: 'Violeta',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.purple,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.purple);
+                    Navigator.pop(context);
+                  },
+                ),
+                _ThemeCircle(
+                  color: Colors.black,
+                  label: 'Dark',
+                  isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.dark,
+                  onTap: () {
+                    context.read<ThemeCubit>().changeTheme(AppThemeCandidate.dark);
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -294,6 +404,52 @@ class _QuickActionButton extends StatelessWidget {
             Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ThemeCircle extends StatelessWidget {
+  final Color color;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ThemeCircle({
+    required this.color,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              border: isSelected ? Border.all(color: Colors.orange, width: 3) : null,
+              boxShadow: [
+                if (isSelected)
+                  BoxShadow(
+                    color: color.withOpacity(0.4),
+                    blurRadius: 8,
+                    spreadRadius: 2,
+                  )
+              ],
+            ),
+            child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 20) : null,
+          ),
+          const SizedBox(height: 4),
+          Text(label, style: const TextStyle(fontSize: 10)),
+        ],
       ),
     );
   }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'core/di/injection.dart';
 import 'core/theme/app_theme.dart';
+import 'core/theme/theme_cubit.dart';
 import 'features/members/domain/entities/member.dart';
 import 'features/members/presentation/bloc/members_bloc.dart';
 import 'features/members/presentation/pages/member_form_page.dart';
@@ -29,21 +30,26 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => getIt<MembersBloc>()),
+        BlocProvider(create: (_) => getIt<ThemeCubit>()),
       ],
-      child: MaterialApp.router(
-        title: 'Redil',
-        theme: AppTheme.theme,
-        routerConfig: _router,
-        debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('es', 'ES'),
-        ],
-        locale: const Locale('es', 'ES'),
+      child: BlocBuilder<ThemeCubit, AppThemeCandidate>(
+        builder: (context, themeCandidate) {
+          return MaterialApp.router(
+            title: 'Redil',
+            theme: AppTheme.getTheme(themeCandidate),
+            routerConfig: _router,
+            debugShowCheckedModeBanner: false,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('es', 'ES'),
+            ],
+            locale: const Locale('es', 'ES'),
+          );
+        },
       ),
     );
   }

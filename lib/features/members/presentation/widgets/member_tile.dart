@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/services/statistics_service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/members_bloc.dart';
@@ -16,63 +19,193 @@ class MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        onTap: onTap,
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                '${member.firstName} ${member.lastName}',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+    return FutureBuilder<Map<String, dynamic>>(
+      future: getIt<StatisticsService>().getMemberStats(member.id!),
+      builder: (context, snapshot) {
+        final stats = snapshot.data ?? {'percentage': 0.0};
+        final percentage = stats['percentage'] as double;
+        final history = stats['history'] as List<Map<String, dynamic>>? ?? [];
+
+        return Card(
+          elevation: 0.5,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            onTap: () => _showMemberStatsDialog(context, percentage, history),
+            leading: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: _getStatusColor(member, percentage),
+                  width: 2.5,
+                ),
+              ),
+              child: CircleAvatar(
+                backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+                child: Text(
+                  member.firstName.substring(0, 1).toUpperCase(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
               ),
             ),
-              if (_isBirthdayToday(member.dateOfBirth))
-                Icon(Icons.cake, color: Theme.of(context).colorScheme.secondary),
-          ],
-        ),
-        subtitle: Text(
-          member.role.label.toUpperCase(),
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${member.firstName} ${member.lastName}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
+                ),
+                  if (_isBirthdayToday(member.dateOfBirth))
+                    Icon(Icons.cake, color: Theme.of(context).colorScheme.secondary, size: 20),
+              ],
+            ),
+            subtitle: RichText(
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 12, color: Colors.grey[600]),
+                children: [
+                  TextSpan(text: member.role.label.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w500)),
+                  const TextSpan(text: '  |  '),
+                  TextSpan(
+                    text: '${percentage.toStringAsFixed(0)}%',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: percentage < 50 ? Colors.red : Theme.of(context).primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.grey),
+                    onPressed: () {
+                      context.push('/edit', extra: member).then((_) {
+                        if (context.mounted) {
+                          context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+                        }
+                      });
+                    },
+                  ),
+                 IconButton(
+                   icon: const Icon(Icons.chat_bubble_outline, color: Colors.green),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => WhatsAppMessageDialog(member: member),
+                      );
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () => _confirmDelete(context),
+                  ),
+                ],
+              ),
           ),
-        ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-             _buildStatusIcon(member.status),
-             const SizedBox(width: 8),
-              IconButton(
-                icon: const Icon(Icons.edit, color: Colors.grey),
-                onPressed: () {
-                  context.push('/edit', extra: member).then((_) {
-                    if (context.mounted) {
-                      context.read<MembersBloc>().add(const MembersEvent.loadMembers());
-                    }
-                  });
-                },
+        );
+      },
+    );
+  }
+
+  Color _getStatusColor(Member member, double percentage) {
+    if (member.status == MemberStatus.suspended) return Colors.red;
+    if (member.status == MemberStatus.inactive) return Colors.grey;
+    
+    // Heuristic: If percentage < 50% -> Warning/Red
+    if (percentage < 50) return Colors.red;
+    
+    return Colors.green; // Default Active/Present
+  }
+
+  void _showMemberStatsDialog(BuildContext context, double percentage, List<Map<String, dynamic>> history) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Center(child: Text('${member.firstName} ${member.lastName}', style: const TextStyle(fontWeight: FontWeight.bold))),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Percentage Indicator
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  SizedBox(
+                    height: 80,
+                    width: 80,
+                    child: CircularProgressIndicator(
+                      value: percentage / 100,
+                      strokeWidth: 8,
+                      backgroundColor: Colors.grey[200],
+                      valueColor: AlwaysStoppedAnimation<Color>(percentage < 50 ? Colors.red : Colors.green),
+                    ),
+                  ),
+                  Text(
+                    '${percentage.toStringAsFixed(0)}%',
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
-             IconButton(
-               icon: const Icon(Icons.chat, color: Colors.green),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => WhatsAppMessageDialog(member: member),
-                  );
-                },
+              const SizedBox(height: 24),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Últimos Eventos:', style: TextStyle(fontWeight: FontWeight.w600)),
               ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
-                onPressed: () => _confirmDelete(context),
-              ),
+              const SizedBox(height: 8),
+              if (history.isEmpty)
+                const Text('Sin historial reciente.', style: TextStyle(color: Colors.grey)),
+              ...history.take(5).map((event) {
+                final attended = event['attended'] as bool;
+                final date = event['date'] as DateTime;
+                final description = event['description'] as String? ?? 'Evento';
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(
+                    children: [
+                      Icon(
+                        attended ? Icons.check_circle_outline : Icons.cancel_outlined,
+                        color: attended ? Colors.green : Colors.red,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      // Extract Date
+                      Expanded(
+                        child: Text(
+                           '${DateFormat('dd/MM').format(date)} - $description',
+                           style: const TextStyle(fontSize: 13),
+                           overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
             ],
           ),
-        ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CERRAR'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.push('/member/profile', extra: member);
+              },
+              child: const Text('VER PERFIL COMPLETO'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -104,24 +237,5 @@ class MemberTile extends StatelessWidget {
     if (dob == null) return false;
     final now = DateTime.now();
     return dob.day == now.day && dob.month == now.month;
-  }
-
-  Widget _buildStatusIcon(MemberStatus status) {
-    Color color;
-    switch (status) {
-      case MemberStatus.active:
-        color = Colors.green;
-        break;
-      case MemberStatus.inactive:
-        color = Colors.grey;
-        break;
-      case MemberStatus.suspended:
-        color = Colors.red;
-        break;
-    }
-    return Tooltip(
-      message: status.label,
-      child: Icon(Icons.circle, color: color, size: 14),
-    );
   }
 }

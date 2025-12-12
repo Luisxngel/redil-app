@@ -88,4 +88,46 @@ class StatisticsService {
      final total = recentEvents.fold(0, (sum, event) => sum + event.presentMemberIds.length);
      return total / recentEvents.length;
   }
+
+  /// 5. Member History
+  Future<List<Map<String, dynamic>>> getMemberHistory(String memberId) async {
+    final history = await _attendanceRepo.getHistory().first;
+    // Map events to history records
+    // We want to know if the member was present at each event
+    
+    return history.map((event) {
+      final attended = event.presentMemberIds.contains(memberId);
+      return {
+        'date': event.date,
+        'description': event.description ?? 'Reunión General', // Assuming description exists or default
+        'attended': attended,
+      };
+    }).toList();
+  }
+
+  /// 6. Member Stats for Tile (Percentage)
+  Future<Map<String, dynamic>> getMemberStats(String memberId) async {
+    final history = await _attendanceRepo.getHistory().first;
+    if (history.isEmpty) {
+      return {'percentage': 0.0, 'history': <Map<String, dynamic>>[]};
+    }
+
+    final totalEvents = history.length;
+    final attendedEvents = history.where((e) => e.presentMemberIds.contains(memberId)).length;
+    final percentage = (attendedEvents / totalEvents) * 100;
+
+    // Last 5 events for dialog
+    final historyMap = history.take(5).map((event) {
+      return {
+        'date': event.date,
+        'description': event.description ?? 'Reunión General',
+        'attended': event.presentMemberIds.contains(memberId),
+      };
+    }).toList();
+
+    return {
+      'percentage': percentage,
+      'history': historyMap,
+    };
+  }
 }

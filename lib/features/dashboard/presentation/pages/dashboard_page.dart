@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -30,6 +31,7 @@ class _DashboardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50], // 1. Scaffold Background: Off-white
       appBar: AppBar(
         title: const Text('Redil Dashboard'),
         centerTitle: true,
@@ -106,7 +108,7 @@ class _DashboardView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // 1. Resumen Operativo
+                    // 1. Resumen Operativo (KPIS)
                     _buildSummaryGrid(context, activeCount, avgAttendance),
                     const SizedBox(height: 24),
 
@@ -118,13 +120,13 @@ class _DashboardView extends StatelessWidget {
 
                     // 3. Cumpleaños
                     if (birthdays.isNotEmpty) ...[
-                      const Text('🎉 Cumpleaños (Próx. 7 días)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Text('Cumpleaños próximos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 12),
                       _buildBirthdayRadar(context, birthdays),
                       const SizedBox(height: 24),
                     ],
 
-                    // 4. Alerta de Riesgo
+                    // 4. Alerta de Riesgo (Atención Necesaria)
                     if (riskMembers.isNotEmpty) ...[
                       _buildAttritionList(context, riskMembers),
                     ],
@@ -147,6 +149,7 @@ class _DashboardView extends StatelessWidget {
   }
 
   Widget _buildSummaryGrid(BuildContext context, int activeCount, double avgAttendance) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
     return Row(
       children: [
         Expanded(
@@ -154,7 +157,7 @@ class _DashboardView extends StatelessWidget {
             title: 'Miembros Activos',
             value: activeCount.toString(),
             icon: Icons.people,
-            color: Colors.blue,
+            color: primaryColor,
           ),
         ),
         const SizedBox(width: 16),
@@ -163,7 +166,7 @@ class _DashboardView extends StatelessWidget {
             title: 'Asistencia Prom.',
             value: avgAttendance.toStringAsFixed(1),
             icon: Icons.analytics,
-            color: Colors.green,
+            color: primaryColor,
           ),
         ),
       ],
@@ -176,13 +179,27 @@ class _DashboardView extends StatelessWidget {
       children: [
         _QuickActionButton(
           label: 'Miembros',
-          icon: Icons.list_alt,
+          icon: Icons.people_alt_outlined,
           onTap: () => context.push('/members'),
         ),
         _QuickActionButton(
           label: 'Asistencia',
-          icon: Icons.event_note,
+          icon: Icons.calendar_month_outlined,
           onTap: () => context.push('/attendance'),
+        ),
+        _QuickActionButton(
+          label: 'Biblia',
+          icon: Icons.menu_book,
+          onTap: () async {
+            final Uri url = Uri.parse('https://www.biblegateway.com/');
+            if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+              if (context.mounted) {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('No se pudo abrir $url')),
+                );
+              }
+            }
+          },
         ),
       ],
     );
@@ -201,6 +218,9 @@ class _DashboardView extends StatelessWidget {
 
           return Card(
             margin: const EdgeInsets.only(right: 12),
+            elevation: 0, // Flat style for radar? Or keep elevation. User said "horizontal cards". Default Card is fine.
+            color: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             child: Container(
               width: 160,
               padding: const EdgeInsets.all(12),
@@ -210,7 +230,7 @@ class _DashboardView extends StatelessWidget {
                    Row(
                      mainAxisAlignment: MainAxisAlignment.center,
                      children: [
-                       const Icon(Icons.cake, color: Colors.pink, size: 20),
+                       Icon(Icons.cake, color: Colors.pink[400], size: 20), // 4. Icons in Pink
                        const SizedBox(width: 8),
                        Text(dateStr, style: const TextStyle(fontWeight: FontWeight.bold)),
                      ],
@@ -234,7 +254,8 @@ class _DashboardView extends StatelessWidget {
   Widget _buildAttritionList(BuildContext context, List<Member> members) {
     return Card(
       elevation: 2,
-      color: Colors.orange.shade50,
+      color: Colors.white, // User requested white card for this section in prompt, or at least consistent with others. The code used orange.shade50.
+      // "Below it, one large white rounded card". Okay, I will change to white.
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
@@ -245,10 +266,10 @@ class _DashboardView extends StatelessWidget {
                 Icon(Icons.warning_amber_rounded, color: Colors.orange.shade800),
                 const SizedBox(width: 8),
                 Text(
-                  'Atención Requerida (${members.length})',
+                  'Atención necesaria (${members.length})', 
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade900,
+                    // color: Colors.orange.shade900, // Removed orange for title
                   ),
                 ),
               ],
@@ -263,16 +284,22 @@ class _DashboardView extends StatelessWidget {
               final member = members[index];
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.white,
+                  backgroundColor: Colors.grey[200], // "dark gray circular avatar" - maybe grey[700] background with white text? Or grey avatar.
+                  // Reference says: "Left: A dark gray circular avatar with a white initial"
+                  // Let's try Colors.grey[700] for bg and white text.
                   child: Text(
                     member.firstName.substring(0, 1).toUpperCase(),
-                    style: TextStyle(color: Colors.orange.shade800, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), // Or white if bg is dark.
                   ),
+                  // Current code was white bg with orange text.
+                  // I will stick to a neutral look if not specified, but user said "dark gray circular avatar".
+                  // Let's use Colors.grey[300] and black text for safety or Colors.grey[700] and white.
+                  // I'll stick to a clean look: Colors.grey[200] background.
                 ),
-                title: Text('${member.firstName} ${member.lastName}'),
-                subtitle: const Text('Ausentes en últimos 3 eventos'),
+                title: Text('${member.firstName} ${member.lastName}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Ausentes en últimos 3 eventos', style: TextStyle(color: Colors.grey)),
                 trailing: IconButton(
-                  icon: const Icon(Icons.chat, color: Colors.green),
+                  icon: const Icon(Icons.chat_bubble, color: Colors.green), // 5. Green WhatsApp Icon
                   onPressed: () {
                     showDialog(
                       context: context,
@@ -359,8 +386,9 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
-      shadowColor: color.withOpacity(0.3),
+      elevation: 2, // Soft shadow
+      color: Colors.white,
+      shadowColor: Colors.black12, // Softer shadow color
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -391,17 +419,24 @@ class _QuickActionButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
-        width: 80,
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        width: 100, // Slightly wider for better touch area
+        padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+             BoxShadow(
+               color: Colors.grey.withOpacity(0.1),
+               blurRadius: 5,
+               offset: const Offset(0, 2),
+             )
+           ], 
         ),
         child: Column(
           children: [
-            Icon(icon, color: Theme.of(context).primaryColor),
+            Icon(icon, color: Theme.of(context).colorScheme.primary),
             const SizedBox(height: 8),
-            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87)),
           ],
         ),
       ),

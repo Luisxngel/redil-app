@@ -1,16 +1,31 @@
+import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/services/statistics_service.dart';
 import '../../../members/domain/entities/member.dart';
 import 'dashboard_event.dart';
 import 'dashboard_state.dart';
+import '../../../attendance/domain/repositories/attendance_repository.dart';
 
 @injectable
 class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
   final StatisticsService _statsService;
+  final AttendanceRepository _attendanceRepo;
+  StreamSubscription? _attendanceSubscription;
 
-  DashboardBloc(this._statsService) : super(const DashboardState.initial()) {
+  DashboardBloc(this._statsService, this._attendanceRepo) : super(const DashboardState.initial()) {
     on<LoadDashboardData>(_onLoadDashboardData);
+
+    // Reactivity: Reload dashboard when attendance changes
+    _attendanceSubscription = _attendanceRepo.getHistory().listen((_) {
+      add(const LoadDashboardData());
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _attendanceSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onLoadDashboardData(LoadDashboardData event, Emitter<DashboardState> emit) async {

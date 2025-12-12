@@ -1,13 +1,17 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../domain/entities/member.dart';
 import '../../domain/repositories/member_repository.dart';
+import '../../../../features/attendance/domain/repositories/attendance_repository.dart';
 import 'members_event.dart';
 import 'members_state.dart';
 
 @injectable
 class MembersBloc extends Bloc<MembersEvent, MembersState> {
   final MemberRepository _repository;
+  final AttendanceRepository _attendanceRepo;
+  StreamSubscription? _attendanceSubscription;
   
   // Keep track of current members and filter state for in-memory filtering if needed
   // However, requirements say "LoadMembers (Subscribe to stream)".
@@ -20,7 +24,7 @@ class MembersBloc extends Bloc<MembersEvent, MembersState> {
 
   MemberStatus? _currentFilter;
 
-  MembersBloc(this._repository) : super(const MembersState.initial()) {
+  MembersBloc(this._repository, this._attendanceRepo) : super(const MembersState.initial()) {
     on<LoadMembers>(_onLoadMembers);
     on<AddMember>(_onAddMember);
     on<DeleteMember>(_onDeleteMember);
@@ -31,6 +35,17 @@ class MembersBloc extends Bloc<MembersEvent, MembersState> {
     on<RestoreMember>(_onRestoreMember);
     on<HardDeleteMember>(_onHardDeleteMember);
     on<WipeAllData>(_onWipeAllData);
+
+    // Reactivity: Reload members when attendance changes (affects Status Ring and Risk)
+    _attendanceSubscription = _attendanceRepo.getHistory().listen((_) {
+      add(const LoadMembers());
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _attendanceSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onWipeAllData(

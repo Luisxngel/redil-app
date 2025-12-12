@@ -15,6 +15,8 @@ import 'features/attendance/presentation/pages/attendance_history_page.dart';
 import 'features/attendance/presentation/pages/attendance_form_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_page.dart';
 
+import 'features/members/presentation/pages/member_profile_page.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('es', null);
@@ -65,6 +67,13 @@ final _router = GoRouter(
     GoRoute(
       path: '/members',
       builder: (context, state) => const MembersPage(),
+    ),
+    GoRoute(
+      path: '/member/profile',
+      builder: (context, state) {
+        final member = state.extra as Member;
+        return MemberProfilePage(member: member);
+      },
     ),
     GoRoute(
       path: '/add',

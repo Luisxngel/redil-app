@@ -19,13 +19,14 @@ class AttendanceFormPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<AttendanceBloc>()..add(AttendanceEvent.loadForm(attendanceId)),
-      child: const _AttendanceFormView(),
+      child: _AttendanceFormView(attendanceId: attendanceId),
     );
   }
 }
 
 class _AttendanceFormView extends StatefulWidget {
-  const _AttendanceFormView();
+  final String? attendanceId;
+  const _AttendanceFormView({this.attendanceId});
 
   @override
   State<_AttendanceFormView> createState() => _AttendanceFormViewState();
@@ -34,28 +35,15 @@ class _AttendanceFormView extends StatefulWidget {
 class _AttendanceFormViewState extends State<_AttendanceFormView> {
   DateTime _selectedDate = DateTime.now();
   final TextEditingController _descController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  bool _initialized = false;
+  String _targetRole = 'ALL';
+  Set<String> _invitedIds = {};
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Asistencia'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () {
-               context.read<AttendanceBloc>().add(AttendanceEvent.saveEvent(
-                 date: _selectedDate,
-                 description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
-               ));
-            },
-          )
-        ],
+        title: Text(widget.attendanceId == null ? 'Nuevo Evento' : 'Editar Evento'),
       ),
       body: BlocConsumer<AttendanceBloc, AttendanceState>(
         listener: (context, state) {
@@ -66,176 +54,172 @@ class _AttendanceFormViewState extends State<_AttendanceFormView> {
              },
              error: (msg) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.red)),
              formLoaded: (existing, members, selected) {
-                if (existing != null && _descController.text.isEmpty) {
-                   // Only set once
-                   _descController.text = existing.description ?? '';
-                   // setState not needed if just text field?
-                   // But date needs setState
-                   // Wait, this listener runs every time state changes (including toggle).
-                   // We shouldn't reset fields on toggle.
-                   // Bloc emits a new FormLoaded on Toggle.
-                   // We need a check.
+                if (existing != null && !_initialized) {
+                   WidgetsBinding.instance.addPostFrameCallback((_) {
+                     if (mounted) {
+                       setState(() {
+                         _selectedDate = existing.date;
+                         _descController.text = existing.description ?? '';
+                         _targetRole = existing.targetRole;
+                         _invitedIds = Set.from(existing.invitedMemberIds);
+                         _initialized = true;
+                       });
+                     }
+                   });
+                } else if (existing == null && !_initialized) {
+                   _initialized = true;
                 }
              }
            );
         },
         builder: (context, state) {
-          return state.maybeWhen(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            formLoaded: (existingEvent, allMembers, selectedIds) {
-               // Setup check for initial data load ONLY ONCE
-               // Actually we can do it in Builder if we guard it, or initState equivalent.
-               // A trick is to use a boolean flag in State or check if controllers are empty vs existing.
-               if (existingEvent != null && _selectedDate == DateTime.now() && _selectedDate.difference(existingEvent.date).inSeconds.abs() > 5) { // Dummy check
-                   // Ideally we set this in Bloc's state or pass it to UI differently.
-                   // But let's trust that if the user hasn't changed it, we sync.
-                   // A better way: The State holds the source of truth? No, TextField holds it.
-                   // Let's just update `_selectedDate` if it matches default.
-                   // For now, let's execute this assignment synchronously in the builder is okay? No, setState in builder is bad.
-                   // We should initialize in `listener` but guard it.
-               }
-               // Wait, I can just use a local bool `_initialized`.
-               if (!_initialized && existingEvent != null) {
-                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                   setState(() {
-                     _selectedDate = existingEvent.date;
-                     _descController.text = existingEvent.description ?? '';
-                     _initialized = true;
-                   });
-                 });
-               } else if (!_initialized && existingEvent == null) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                   setState(() {
-                     _initialized = true; // Mark as initialized for new event too
-                   });
-                 });
-               }
+          final isLoading = state.maybeWhen(loading: () => true, orElse: () => false);
+          if (isLoading) return const Center(child: CircularProgressIndicator());
+          
+          final allMembers = state.maybeWhen(
+            formLoaded: (_, members, __) => members,
+            orElse: () => <Member>[]
+          );
 
-              // Group logic (Duplicated from MembersPage, could be refactored to a shared widget)
-               final Map<MemberRole, List<Member>> groupedMembers = {};
-              for (var member in allMembers) {
-                if (!groupedMembers.containsKey(member.role)) {
-                  groupedMembers[member.role] = [];
-                }
-                groupedMembers[member.role]!.add(member);
-              }
-               final sortedRoles = groupedMembers.keys.toList()
-                ..sort((a, b) => a.index.compareTo(b.index));
-
-              return Column(
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Padding(
-                     padding: const EdgeInsets.all(16.0),
-                     child: Row(
-                       children: [
-                         Expanded(
-                           child: InkWell(
-                             onTap: () async {
-                               final picked = await showDatePicker(
-                                 context: context,
-                                 initialDate: _selectedDate,
-                                 firstDate: DateTime(2020),
-                                 lastDate: DateTime(2030),
-                               );
-                               if (picked != null) {
-                                 setState(() => _selectedDate = picked);
-                               }
-                             },
-                             child: InputDecorator(
-                               decoration: const InputDecoration(
-                                 labelText: 'Fecha',
-                                 border: OutlineInputBorder(),
-                                 prefixIcon: Icon(Icons.calendar_today),
-                               ),
-                               child: Text(DateFormat.yMMMMEEEEd('es').format(_selectedDate)),
-                             ),
-                           ),
-                         ),
-                         const SizedBox(width: 16),
-                         Expanded(
-                           child: TextField(
-                             controller: _descController,
-                             decoration: const InputDecoration(
-                               labelText: 'Descripción (Opcional)',
-                               border: OutlineInputBorder(),
-                             ),
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                   const Divider(),
-                   Expanded(
-                     child: ListView.builder(
-                       itemCount: sortedRoles.length,
-                       itemBuilder: (context, index) {
-                          final role = sortedRoles[index];
-                          final roleMembers = groupedMembers[role]!;
-                          roleMembers.sort((a, b) => a.firstName.compareTo(b.firstName));
-                          
-                          final count = roleMembers.length;
-                          // Count selected in this group
-                          final selectedInGroup = roleMembers.where((m) => selectedIds.contains(m.id)).length;
+                  const Text(
+                    'Detalles del Evento',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // DATE PICKER
+                  InkWell(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedDate,
+                        firstDate: DateTime(2020),
+                        lastDate: DateTime(2030),
+                      );
+                      if (picked != null) {
+                        setState(() => _selectedDate = picked);
+                      }
+                    },
+                    child: InputDecorator(
+                      decoration: const InputDecoration(
+                        labelText: 'Fecha del Evento',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.calendar_today),
+                        helperText: 'Día en que se realizará la reunión',
+                      ),
+                      child: Text(
+                        DateFormat.yMMMMEEEEd('es').format(_selectedDate),
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // DESCRIPTION
+                  TextField(
+                    controller: _descController,
+                    decoration: const InputDecoration(
+                      labelText: 'Nombre / Descripción',
+                      hintText: 'Ej: Culto Dominical, Reunión de Jóvenes',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.event_note),
+                    ),
+                  ),
 
-                          return ExpansionTile(
-                            initiallyExpanded: true, // Always expand for taking roll? Or same logic? Let's Expand All for easier checklist.
-                            title: Row(
-                              children: [
-                                Text(
-                                  role.labelPlural.toUpperCase(),
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                                const Spacer(),
-                                Chip(label: Text('$selectedInGroup / $count'), materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,)
-                              ],
-                            ),
-                            children: roleMembers.map((member) {
-                              final isSelected = selectedIds.contains(member.id); // member.id should be the UUID string now
-                              return CheckboxListTile(
-                                value: isSelected,
-                                title: Text('${member.firstName} ${member.lastName}'),
-                                secondary: CircleAvatar(
-                                  radius: 16,
-                                  child: Text(member.firstName[0]),
-                                ),
-                                onChanged: (val) {
-                                  context.read<AttendanceBloc>().add(AttendanceEvent.toggleMember(member.id!));
-                                },
-                              );
-                            }).toList(),
+                  const SizedBox(height: 24),
+
+                  // TARGET ROLE DROPDOWN
+                  DropdownButtonFormField<String>(
+                    value: _targetRole,
+                    decoration: const InputDecoration(
+                      labelText: 'Dirigido a:',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.people_alt_outlined),
+                      helperText: 'Define quiénes deben asistir obligatoriamente',
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'ALL', child: Text('Todo el Redil (Obligatorio)')),
+                      DropdownMenuItem(value: 'LIDER', child: Text('Solo Líderes')),
+                      DropdownMenuItem(value: 'MEMBER', child: Text('Solo Miembros')),
+                      DropdownMenuItem(value: 'OPTIONAL', child: Text('Opcional / Libre')),
+                      DropdownMenuItem(value: 'MANUAL', child: Text('Selección Manual')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        setState(() => _targetRole = val);
+                      }
+                    },
+                  ),
+                  
+                  // MANUAL SELECTION LIST
+                  if (_targetRole == 'MANUAL') ...[
+                    const SizedBox(height: 16),
+                    const Text('Seleccionar Invitados:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Container(
+                      height: 300,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ListView.builder(
+                        itemCount: allMembers.length,
+                        itemBuilder: (context, index) {
+                          final member = allMembers[index];
+                          final isSelected = _invitedIds.contains(member.id);
+                          return CheckboxListTile(
+                            title: Text('${member.firstName} ${member.lastName}'),
+                            subtitle: Text(member.role.label),
+                            value: isSelected,
+                            onChanged: (val) {
+                              setState(() {
+                                if (val == true) {
+                                  _invitedIds.add(member.id!);
+                                } else {
+                                  _invitedIds.remove(member.id);
+                                }
+                              });
+                            },
                           );
-                       },
-                     ),
-                   ),
-                   Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.save),
-                        label: const Text('GUARDAR ASISTENCIA'),
-                        onPressed: () {
-                           context.read<AttendanceBloc>().add(AttendanceEvent.saveEvent(
-                             date: _selectedDate,
-                             description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
-                           ));
                         },
                       ),
                     ),
-                   ),
+                  ],
+
+                  const SizedBox(height: 48), // Spacer replacement
+                  
+                  // SAVE BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      icon: const Icon(Icons.save),
+                      label: Text(widget.attendanceId == null ? 'CREAR EVENTO' : 'GUARDAR CAMBIOS'),
+                       style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () {
+                         context.read<AttendanceBloc>().add(AttendanceEvent.saveEvent(
+                           date: _selectedDate,
+                           description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
+                           targetRole: _targetRole,
+                           invitedMemberIds: _invitedIds.toList(),
+                         ));
+                      },
+                    ),
+                  ),
                 ],
-              );
-            },
-            orElse: () => const Center(child: CircularProgressIndicator()),
+              ),
+            ),
           );
         },
       ),
     );
   }
-
-  bool _initialized = false;
 }

@@ -21,7 +21,9 @@ mixin _$AttendanceEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) =>
       throw _privateConstructorUsedError;
@@ -30,7 +32,9 @@ mixin _$AttendanceEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) =>
       throw _privateConstructorUsedError;
@@ -39,7 +43,9 @@ mixin _$AttendanceEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) =>
@@ -133,7 +139,9 @@ class _$LoadHistoryImpl implements LoadHistory {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
     return loadHistory();
@@ -145,7 +153,9 @@ class _$LoadHistoryImpl implements LoadHistory {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
     return loadHistory?.call();
@@ -157,7 +167,9 @@ class _$LoadHistoryImpl implements LoadHistory {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {
@@ -280,7 +292,9 @@ class _$LoadFormImpl implements LoadForm {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
     return loadForm(attendanceId);
@@ -292,7 +306,9 @@ class _$LoadFormImpl implements LoadForm {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
     return loadForm?.call(attendanceId);
@@ -304,7 +320,9 @@ class _$LoadFormImpl implements LoadForm {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {
@@ -432,7 +450,9 @@ class _$ToggleMemberImpl implements ToggleMember {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
     return toggleMember(memberId);
@@ -444,7 +464,9 @@ class _$ToggleMemberImpl implements ToggleMember {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
     return toggleMember?.call(memberId);
@@ -456,7 +478,9 @@ class _$ToggleMemberImpl implements ToggleMember {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {
@@ -522,7 +546,11 @@ abstract class _$$SaveEventImplCopyWith<$Res> {
           _$SaveEventImpl value, $Res Function(_$SaveEventImpl) then) =
       __$$SaveEventImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({DateTime date, String? description});
+  $Res call(
+      {DateTime date,
+      String? description,
+      String targetRole,
+      List<String> invitedMemberIds});
 }
 
 /// @nodoc
@@ -538,6 +566,8 @@ class __$$SaveEventImplCopyWithImpl<$Res>
   $Res call({
     Object? date = null,
     Object? description = freezed,
+    Object? targetRole = null,
+    Object? invitedMemberIds = null,
   }) {
     return _then(_$SaveEventImpl(
       date: null == date
@@ -548,6 +578,14 @@ class __$$SaveEventImplCopyWithImpl<$Res>
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
               as String?,
+      targetRole: null == targetRole
+          ? _value.targetRole
+          : targetRole // ignore: cast_nullable_to_non_nullable
+              as String,
+      invitedMemberIds: null == invitedMemberIds
+          ? _value._invitedMemberIds
+          : invitedMemberIds // ignore: cast_nullable_to_non_nullable
+              as List<String>,
     ));
   }
 }
@@ -555,16 +593,33 @@ class __$$SaveEventImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$SaveEventImpl implements SaveEvent {
-  const _$SaveEventImpl({required this.date, this.description});
+  const _$SaveEventImpl(
+      {required this.date,
+      this.description,
+      this.targetRole = 'ALL',
+      final List<String> invitedMemberIds = const []})
+      : _invitedMemberIds = invitedMemberIds;
 
   @override
   final DateTime date;
   @override
   final String? description;
+  @override
+  @JsonKey()
+  final String targetRole;
+  final List<String> _invitedMemberIds;
+  @override
+  @JsonKey()
+  List<String> get invitedMemberIds {
+    if (_invitedMemberIds is EqualUnmodifiableListView)
+      return _invitedMemberIds;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_invitedMemberIds);
+  }
 
   @override
   String toString() {
-    return 'AttendanceEvent.saveEvent(date: $date, description: $description)';
+    return 'AttendanceEvent.saveEvent(date: $date, description: $description, targetRole: $targetRole, invitedMemberIds: $invitedMemberIds)';
   }
 
   @override
@@ -574,11 +629,16 @@ class _$SaveEventImpl implements SaveEvent {
             other is _$SaveEventImpl &&
             (identical(other.date, date) || other.date == date) &&
             (identical(other.description, description) ||
-                other.description == description));
+                other.description == description) &&
+            (identical(other.targetRole, targetRole) ||
+                other.targetRole == targetRole) &&
+            const DeepCollectionEquality()
+                .equals(other._invitedMemberIds, _invitedMemberIds));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, date, description);
+  int get hashCode => Object.hash(runtimeType, date, description, targetRole,
+      const DeepCollectionEquality().hash(_invitedMemberIds));
 
   @JsonKey(ignore: true)
   @override
@@ -592,10 +652,12 @@ class _$SaveEventImpl implements SaveEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
-    return saveEvent(date, description);
+    return saveEvent(date, description, targetRole, invitedMemberIds);
   }
 
   @override
@@ -604,10 +666,12 @@ class _$SaveEventImpl implements SaveEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
-    return saveEvent?.call(date, description);
+    return saveEvent?.call(date, description, targetRole, invitedMemberIds);
   }
 
   @override
@@ -616,12 +680,14 @@ class _$SaveEventImpl implements SaveEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {
     if (saveEvent != null) {
-      return saveEvent(date, description);
+      return saveEvent(date, description, targetRole, invitedMemberIds);
     }
     return orElse();
   }
@@ -670,10 +736,14 @@ class _$SaveEventImpl implements SaveEvent {
 abstract class SaveEvent implements AttendanceEvent {
   const factory SaveEvent(
       {required final DateTime date,
-      final String? description}) = _$SaveEventImpl;
+      final String? description,
+      final String targetRole,
+      final List<String> invitedMemberIds}) = _$SaveEventImpl;
 
   DateTime get date;
   String? get description;
+  String get targetRole;
+  List<String> get invitedMemberIds;
   @JsonKey(ignore: true)
   _$$SaveEventImplCopyWith<_$SaveEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -746,7 +816,9 @@ class _$DeleteEventImpl implements DeleteEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description) saveEvent,
+    required TResult Function(DateTime date, String? description,
+            String targetRole, List<String> invitedMemberIds)
+        saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
     return deleteEvent(id);
@@ -758,7 +830,9 @@ class _$DeleteEventImpl implements DeleteEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description)? saveEvent,
+    TResult? Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
     return deleteEvent?.call(id);
@@ -770,7 +844,9 @@ class _$DeleteEventImpl implements DeleteEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description)? saveEvent,
+    TResult Function(DateTime date, String? description, String targetRole,
+            List<String> invitedMemberIds)?
+        saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {

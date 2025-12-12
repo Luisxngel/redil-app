@@ -14,13 +14,17 @@ class AttendanceModel {
   late String? description;
   
   late List<String> presentMemberIds;
+  late String targetRole = 'ALL';
+  late List<String> invitedMemberIds = [];
 
   static AttendanceModel fromEntity(Attendance attendance) {
     return AttendanceModel()
       ..id = attendance.id
       ..date = attendance.date
       ..description = attendance.description
-      ..presentMemberIds = attendance.presentMemberIds;
+      ..presentMemberIds = attendance.presentMemberIds
+      ..targetRole = attendance.targetRole
+      ..invitedMemberIds = attendance.invitedMemberIds;
   }
 
   Attendance toEntity() {
@@ -29,6 +33,8 @@ class AttendanceModel {
       date: date,
       description: description,
       presentMemberIds: presentMemberIds,
+      targetRole: targetRole,
+      invitedMemberIds: invitedMemberIds,
     );
   }
 }

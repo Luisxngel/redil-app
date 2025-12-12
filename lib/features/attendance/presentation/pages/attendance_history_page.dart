@@ -79,33 +79,48 @@ class _AttendanceHistoryView extends StatelessWidget {
                         style: TextStyle(color: Colors.grey[600]),
                       ),
                       onTap: () {
-                         context.push('/attendance/form', extra: event.id).then((_) {
+                         context.push('/attendance/check', extra: event.id).then((_) {
                            if(context.mounted) {
                              context.read<AttendanceBloc>().add(const AttendanceEvent.loadHistory());
                            }
                          });
                       },
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        onPressed: () {
-                           showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Eliminar Evento'),
-                              content: const Text('¿Estás seguro de que deseas eliminar este registro?'),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    context.read<AttendanceBloc>().add(AttendanceEvent.deleteEvent(event.id));
-                                  },
-                                  child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            onPressed: () {
+                               context.push('/attendance/form', extra: event.id).then((_) {
+                                 if(context.mounted) {
+                                   context.read<AttendanceBloc>().add(const AttendanceEvent.loadHistory());
+                                 }
+                               });
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.red),
+                            onPressed: () {
+                               showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Eliminar Evento'),
+                                  content: const Text('¿Estás seguro de que deseas eliminar este registro?'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar')),
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        context.read<AttendanceBloc>().add(AttendanceEvent.deleteEvent(event.id));
+                                      },
+                                      child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          );
-                        },
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   );

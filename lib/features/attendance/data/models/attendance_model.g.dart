@@ -32,10 +32,20 @@ const AttendanceModelSchema = CollectionSchema(
       name: r'id',
       type: IsarType.string,
     ),
-    r'presentMemberIds': PropertySchema(
+    r'invitedMemberIds': PropertySchema(
       id: 3,
+      name: r'invitedMemberIds',
+      type: IsarType.stringList,
+    ),
+    r'presentMemberIds': PropertySchema(
+      id: 4,
       name: r'presentMemberIds',
       type: IsarType.stringList,
+    ),
+    r'targetRole': PropertySchema(
+      id: 5,
+      name: r'targetRole',
+      type: IsarType.string,
     )
   },
   estimateSize: _attendanceModelEstimateSize,
@@ -79,6 +89,13 @@ int _attendanceModelEstimateSize(
     }
   }
   bytesCount += 3 + object.id.length * 3;
+  bytesCount += 3 + object.invitedMemberIds.length * 3;
+  {
+    for (var i = 0; i < object.invitedMemberIds.length; i++) {
+      final value = object.invitedMemberIds[i];
+      bytesCount += value.length * 3;
+    }
+  }
   bytesCount += 3 + object.presentMemberIds.length * 3;
   {
     for (var i = 0; i < object.presentMemberIds.length; i++) {
@@ -86,6 +103,7 @@ int _attendanceModelEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  bytesCount += 3 + object.targetRole.length * 3;
   return bytesCount;
 }
 
@@ -98,7 +116,9 @@ void _attendanceModelSerialize(
   writer.writeDateTime(offsets[0], object.date);
   writer.writeString(offsets[1], object.description);
   writer.writeString(offsets[2], object.id);
-  writer.writeStringList(offsets[3], object.presentMemberIds);
+  writer.writeStringList(offsets[3], object.invitedMemberIds);
+  writer.writeStringList(offsets[4], object.presentMemberIds);
+  writer.writeString(offsets[5], object.targetRole);
 }
 
 AttendanceModel _attendanceModelDeserialize(
@@ -111,7 +131,9 @@ AttendanceModel _attendanceModelDeserialize(
   object.date = reader.readDateTime(offsets[0]);
   object.description = reader.readStringOrNull(offsets[1]);
   object.id = reader.readString(offsets[2]);
-  object.presentMemberIds = reader.readStringList(offsets[3]) ?? [];
+  object.invitedMemberIds = reader.readStringList(offsets[3]) ?? [];
+  object.presentMemberIds = reader.readStringList(offsets[4]) ?? [];
+  object.targetRole = reader.readString(offsets[5]);
   return object;
 }
 
@@ -130,6 +152,10 @@ P _attendanceModelDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 3:
       return (reader.readStringList(offset) ?? []) as P;
+    case 4:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 5:
+      return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -675,6 +701,233 @@ extension AttendanceModelQueryFilter
   }
 
   QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'invitedMemberIds',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementContains(String value,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'invitedMemberIds',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementMatches(String pattern,
+          {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'invitedMemberIds',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'invitedMemberIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsElementIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'invitedMemberIds',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      invitedMemberIdsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'invitedMemberIds',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
       isarIdEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -956,6 +1209,142 @@ extension AttendanceModelQueryFilter
       );
     });
   }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'targetRole',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'targetRole',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'targetRole',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'targetRole',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      targetRoleIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'targetRole',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension AttendanceModelQueryObject
@@ -1002,6 +1391,20 @@ extension AttendanceModelQuerySortBy
   QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy> sortByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      sortByTargetRole() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'targetRole', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      sortByTargetRoleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'targetRole', Sort.desc);
     });
   }
 }
@@ -1059,6 +1462,20 @@ extension AttendanceModelQuerySortThenBy
       return query.addSortBy(r'isarId', Sort.desc);
     });
   }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      thenByTargetRole() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'targetRole', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      thenByTargetRoleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'targetRole', Sort.desc);
+    });
+  }
 }
 
 extension AttendanceModelQueryWhereDistinct
@@ -1084,9 +1501,23 @@ extension AttendanceModelQueryWhereDistinct
   }
 
   QueryBuilder<AttendanceModel, AttendanceModel, QDistinct>
+      distinctByInvitedMemberIds() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'invitedMemberIds');
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QDistinct>
       distinctByPresentMemberIds() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'presentMemberIds');
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QDistinct>
+      distinctByTargetRole({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'targetRole', caseSensitive: caseSensitive);
     });
   }
 }
@@ -1119,9 +1550,22 @@ extension AttendanceModelQueryProperty
   }
 
   QueryBuilder<AttendanceModel, List<String>, QQueryOperations>
+      invitedMemberIdsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'invitedMemberIds');
+    });
+  }
+
+  QueryBuilder<AttendanceModel, List<String>, QQueryOperations>
       presentMemberIdsProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'presentMemberIds');
+    });
+  }
+
+  QueryBuilder<AttendanceModel, String, QQueryOperations> targetRoleProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'targetRole');
     });
   }
 }

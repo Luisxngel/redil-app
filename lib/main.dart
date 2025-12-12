@@ -13,6 +13,7 @@ import 'features/members/presentation/pages/members_page.dart';
 import 'features/members/presentation/pages/trash_page.dart';
 import 'features/attendance/presentation/pages/attendance_history_page.dart';
 import 'features/attendance/presentation/pages/attendance_form_page.dart';
+import 'features/attendance/presentation/pages/event_attendance_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_page.dart';
 
 import 'features/members/presentation/pages/member_profile_page.dart';
@@ -99,6 +100,13 @@ final _router = GoRouter(
       builder: (context, state) {
         final id = state.extra as String?;
         return AttendanceFormPage(attendanceId: id);
+      },
+    ),
+    GoRoute(
+      path: '/attendance/check',
+      builder: (context, state) {
+        final id = state.extra as String;
+        return EventAttendancePage(attendanceId: id);
       },
     ),
   ],

@@ -10,6 +10,8 @@ class AttendanceEvent with _$AttendanceEvent {
   const factory AttendanceEvent.saveEvent({
     required DateTime date,
     String? description,
+    @Default('ALL') String targetRole,
+    @Default([]) List<String> invitedMemberIds,
   }) = SaveEvent;
   const factory AttendanceEvent.deleteEvent(String id) = DeleteEvent;
 }

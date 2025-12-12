@@ -94,6 +94,8 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
       date: event.date,
       description: event.description,
       presentMemberIds: _currentSelection.toList(),
+      targetRole: event.targetRole,
+      invitedMemberIds: event.invitedMemberIds,
     );
 
     final result = await _checkRepo.saveAttendance(newAttendance);

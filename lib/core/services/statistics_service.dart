@@ -2,6 +2,7 @@ import 'package:injectable/injectable.dart';
 import '../../features/attendance/domain/repositories/attendance_repository.dart';
 import '../../features/attendance/domain/entities/attendance.dart';
 import '../../features/members/domain/entities/member.dart';
+import '../../features/members/domain/entities/member_risk.dart'; // NEW
 import '../../features/members/domain/repositories/member_repository.dart';
 
 @lazySingleton
@@ -47,40 +48,45 @@ class StatisticsService {
       });
   }
 
-  /// 3. Attrition Risk (Absent in last [threshold] MANDATORY events)
-  Future<List<Member>> getAttritionRiskMembers({int threshold = 3}) async {
+  /// 3. Attrition Risk (Consecutive Absences)
+  Future<List<MemberRisk>> getAttritionRiskMembers({int threshold = 3}) async {
     // Get all active members
     final members = await _memberRepo.getMembers().first;
     
-    // Get recent history
+    // Get full history (most recent first, assuming sorted)
+    // Actually AttendanceRepository usually returns sorted by date DESC? 
+    // If not, we should sort member-side or ensure repo does. Assumed DESC.
     final history = await _attendanceRepo.getHistory().first;
     
     if (history.isEmpty) return [];
 
-    return members.where((member) {
-      // Logic: Member is AT RISK if missing from last [threshold] RELEVANT & MANDATORY events.
-      // We scan history backwards until we find [threshold] mandatory events for this user.
-      int checkedEvents = 0;
-      int absences = 0;
+    final List<MemberRisk> riskList = [];
+
+    for (var member in members) {
+      // Logic: Count consecutive absences in MANDATORY events starting from most recent.
+      // Stop at first presence.
+      int consecutiveAbsences = 0;
 
       for (var event in history) {
-        if (checkedEvents >= threshold) break;
-
         final isMandatory = _isMandatoryFor(member, event);
         if (isMandatory) {
-          checkedEvents++;
-          if (!event.presentMemberIds.contains(member.id)) {
-            absences++;
+          final attended = event.presentMemberIds.contains(member.id);
+          if (attended) {
+            // Streak broken
+            break; 
+          } else {
+            consecutiveAbsences++;
           }
         }
       }
 
-      // If we found enough mandatory events, and they missed all of them (or high %), risk.
-      // Simple rule: missed all of the last N mandatory events found.
-      if (checkedEvents == 0) return false; // No mandatory events recently, safe.
-      
-      return absences == checkedEvents; // Missed all considered mandatory events
-    }).toList();
+      // If consecutive absences meet threshold, add to risk list
+      if (consecutiveAbsences >= threshold) {
+        riskList.add(MemberRisk(member, consecutiveAbsences));
+      }
+    }
+    
+    return riskList;
   }
 
   /// 4. Average Attendance (Last [events] count)
@@ -145,6 +151,7 @@ class StatisticsService {
   }
 
   /// 6. Member Stats for Tile (Percentage)
+  /// 6. Member Stats for Tile (Percentage)
   Future<Map<String, dynamic>> getMemberStats(String memberId) async {
     final members = await _memberRepo.getMembers().first;
     Member? member;
@@ -159,43 +166,60 @@ class StatisticsService {
       return {'percentage': 0.0, 'history': <Map<String, dynamic>>[]};
     }
 
-    // Fairness Logic:
-    // Denominator: Mandatory events (ALL or Role) AND NOT OPTIONAL.
-    // Numerator: Any attended event.
-    
-    int denominator = 0;
-    int numerator = 0;
+    int mandatoryTotal = 0;
+    int mandatoryAttended = 0;
+    int extraAttended = 0;
 
     for (var event in history) {
+      print('LOOP Processing: ${event.description} for ${member?.firstName}'); // DEBUG
       final attended = event.presentMemberIds.contains(memberId);
       
-      if (attended) {
-        numerator++;
+      // CASO ESPECIAL: Eventos Opcionales
+      // No suman al denominador (mandatoryTotal). Solo suman extras si asiste.
+      if (event.targetRole == 'OPTIONAL') {
+        if (attended) {
+          extraAttended++;
+        }
+        continue;
       }
-      
+
+      // CASO STANDARD: Verificar obligatoriedad
       if (_isMandatoryFor(member!, event)) {
-        denominator++;
+        mandatoryTotal++;
+        if (attended) {
+          mandatoryAttended++;
+        }
+      } else {
+        // CASO: Evento no dirigido al usuario (Ni por Rol, Ni por Invitación) -> IGNORAR
+        // No suma al denominador ni al numerador.
       }
     }
 
     double percentage = 0.0;
-    if (denominator > 0) {
-      percentage = (numerator / denominator) * 100;
-      // Cap at 100? User implies > 100 is good ("mejora el %").
-      // But for UI (Ring), usually 0-1 range. The ring widget expects 0-100?
-      // Let's cap at 100 for display safety, strictly speaking fairness usually means 100% max.
-      // But if user wants to see >100, we pass it. The UI can handle it.
-      if (percentage > 100) percentage = 100; // Let's cap for UI consistency.
-    } else if (numerator > 0) {
-      percentage = 100.0; // Attended events but none required? 100% score.
+    if (mandatoryTotal > 0) {
+      percentage = (mandatoryAttended / mandatoryTotal) * 100;
+      
+      // Math Safety
+      if (percentage < 0) percentage = 0;
+      if (percentage > 100) percentage = 100; 
+      
+    } else if (mandatoryAttended > 0) {
+      // Edge Case: No tenías obligación pero asististe a obligatorios?
+      // (Puede pasar si cambias de rol después del evento o lógica difusa).
+      percentage = 100.0; 
     }
 
-    // Last 5 displayed events (Same logic as History visibility)
+    // Prepare History for Dialog (Last 5)
     final historyDialog = history.where((event) {
        final attended = event.presentMemberIds.contains(memberId);
-       if (!_isTargetedAt(member!, event) && !attended) return false;
-        if (event.targetRole == 'OPTIONAL' && !attended) return false;
-       return true;
+       
+       // Same visibility logic as calculation
+       if (event.targetRole == 'OPTIONAL') {
+         return attended; // Show optional only if attended
+       }
+       
+       // Show if targeted/mandatory OR if attended (even if not mandatory)
+       return _isMandatoryFor(member!, event) || attended;
     }).take(5).map((event) {
       return {
         'date': event.date,
@@ -206,35 +230,50 @@ class StatisticsService {
 
     return {
       'percentage': percentage,
+      'extraCount': extraAttended,
       'history': historyDialog,
+      'status': (mandatoryTotal == 0 && mandatoryAttended == 0 && extraAttended == 0) ? 'NEUTRAL' : 'ACTIVE',
+      'label': (mandatoryTotal == 0 && mandatoryAttended == 0) ? 'Sin Datos' : '${percentage.toStringAsFixed(0)}%',
     };
   }
 
   // --- Helpers ---
 
   bool _isTargetedAt(Member member, Attendance event) {
-    if (event.targetRole == 'ALL') return true;
+    // Reutilizamos la lógica de obligatoriedad para consistencia visual
     if (event.targetRole == 'OPTIONAL') return true; 
-    if (event.targetRole == 'MANUAL') return event.invitedMemberIds.contains(member.id);
-    
-    if (event.targetRole == 'LIDER' && member.role == MemberRole.leader) return true;
-    if (event.targetRole == 'MEMBER' && member.role == MemberRole.member) return true;
-    if (event.targetRole == 'LIDER' && member.role == MemberRole.assistant) return true;
-    return false;
+    return _isMandatoryFor(member, event);
   }
 
   bool _isMandatoryFor(Member member, Attendance event) {
-    if (event.targetRole == 'OPTIONAL') return false;
-    if (event.targetRole == 'ALL') return true;
-    if (event.targetRole == 'MANUAL') return event.invitedMemberIds.contains(member.id);
+    // --- DEBUG LOGS INJECTED ---
+    print('--- DEBUG CHECK ---');
+    print('User: ${member.firstName} ${member.lastName} (${member.role})');
+    print('Event: ${event.description} | Target: ${event.targetRole}');
+    print('InvitedList: ${event.invitedMemberIds}');
+    print('Is in InvitedList?: ${event.invitedMemberIds.contains(member.id)}');
+    // ---------------------------
 
-    // Role matching
+    // 1. Check de Exclusividad (Prioridad Absoluta)
+    // Si hay invitados explícitos, el evento es EXCLUSIVO para ellos.
+    if (event.invitedMemberIds.isNotEmpty) {
+      return event.invitedMemberIds.contains(member.id);
+    }
+
+    // 2. Logic por Roles (Solo si NO hay invitados específicos)
+    if (event.targetRole == 'OPTIONAL') return false; 
+    
+    if (event.targetRole == 'ALL') return true;
+
     if (event.targetRole == 'LIDER') {
       return member.role == MemberRole.leader || member.role == MemberRole.assistant;
     }
+    
     if (event.targetRole == 'MEMBER') {
       return member.role == MemberRole.member;
     }
+    
+    // Default fallback
     return false;
   }
 }

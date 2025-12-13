@@ -5,8 +5,8 @@ part 'member_model.g.dart';
 
 @collection
 class MemberModel {
-  // Isar ID derived from the stable String ID (UUID)
-  Id get isarId => fastHash(id);
+  // Use Isar's auto-increment ID instead of hashing
+  Id isarId = Isar.autoIncrement;
 
   @Index(unique: true, replace: true)
   final String id; // UUID V4
@@ -32,16 +32,10 @@ class MemberModel {
   final int? civilStatusIndex;
   final String? notes;
   
-  // Mutable to allow soft delete updates without full recreation if needed, 
-  // though recreating is safer for mutability control. 
-  // Isar allows final fields if constructor matches. 
-  // But for 'isDeleted' update in Repository, we might need it mutable 
-  // OR we use .put() with a new copy.
-  // The user asked for "final bool isDeleted".
-  // To allow easy "soft delete", we might want simple mutability.
   bool isDeleted;
 
   MemberModel({
+    this.isarId = Isar.autoIncrement,
     required this.id,
     required this.firstName,
     required this.lastName,
@@ -61,7 +55,8 @@ class MemberModel {
   /// Mapper: Entity -> Model
   static MemberModel fromEntity(Member member) {
     return MemberModel(
-      id: member.id!, // ID must be generated before saving (UUID)
+      // isarId is not set here, it will be handled by logic or default
+      id: member.id!, 
       firstName: Member.sanitizeName(member.firstName),
       lastName: Member.sanitizeName(member.lastName),
       phone: member.phone,
@@ -99,18 +94,4 @@ class MemberModel {
       isDeleted: isDeleted,
     );
   }
-}
-
-/// FNV-1a 64-bit hash algorithm optimized for Dart
-int fastHash(String string) {
-  var hash = 0xcbf29ce484222325;
-  var i = 0;
-  while (i < string.length) {
-    final codeUnit = string.codeUnitAt(i++);
-    hash ^= codeUnit >> 8;
-    hash *= 0x100000001b3;
-    hash ^= codeUnit & 0xFF;
-    hash *= 0x100000001b3;
-  }
-  return hash;
 }

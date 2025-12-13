@@ -36,8 +36,7 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, Member?>> getMemberById(String id) async {
     try {
-      final intId = fastHash(id); // Use fastHash
-      final model = await _isar.memberModels.get(intId);
+      final model = await _isar.memberModels.filter().idEqualTo(id).findFirst();
       return Right(model?.toEntity());
     } catch (e) {
       return Left(DatabaseFailure(e.toString()));
@@ -47,7 +46,20 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> saveMember(Member member) async {
     try {
+      final existing = await _isar.memberModels
+          .filter()
+          .idEqualTo(member.id!)
+          .findFirst();
+
       final model = MemberModel.fromEntity(member);
+      
+      if (existing != null) {
+        model.isarId = existing.isarId; // Update existing record
+        print('DEBUG REPO: Updating existing member (IsarID: ${existing.isarId}) with UUID: ${member.id}');
+      } else {
+        print('DEBUG REPO: Creating new member with UUID: ${member.id}');
+      }
+
       await _isar.writeTxn(() async {
         await _isar.memberModels.put(model);
       });
@@ -60,9 +72,8 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> hardDeleteMember(String id) async {
     try {
-      final intId = fastHash(id);
       await _isar.writeTxn(() async {
-        await _isar.memberModels.delete(intId); 
+        await _isar.memberModels.filter().idEqualTo(id).deleteAll(); 
       });
       return const Right(null);
     } catch (e) {
@@ -73,22 +84,10 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> deleteMember(String id) async {
     try {
-      final intId = fastHash(id);
       await _isar.writeTxn(() async {
-        final member = await _isar.memberModels.get(intId);
+        final member = await _isar.memberModels.filter().idEqualTo(id).findFirst();
         if (member != null) {
-          // Since Isar objects are immutable in our new model (final fields), 
-          // we must create a copy with isDeleted = true.
-          // However, Isar's put() replaces the object with the same ID.
-          // We can use the constructor to copy fields.
-          // OR usually Isar objects are mutable. 
-          // But I made fields final in MemberModel per request.
-          // So I have to create a new instance.
-          
-          member.isDeleted = true; // Wait, I can't set if final.
-          // Ah, I set isDeleted to NOT final in my rewrite logic just in case?
-          // Let's check MemberModel.
-          // YES, I set `bool isDeleted` (no final). So this works.
+          member.isDeleted = true;
           await _isar.memberModels.put(member); 
         }
       });
@@ -101,11 +100,10 @@ class MemberRepositoryImpl implements MemberRepository {
   @override
   Future<Either<Failure, void>> restoreMember(String id) async {
     try {
-      final intId = fastHash(id);
       await _isar.writeTxn(() async {
-        final member = await _isar.memberModels.get(intId);
+        final member = await _isar.memberModels.filter().idEqualTo(id).findFirst();
         if (member != null) {
-          member.isDeleted = false; // Mutable field
+          member.isDeleted = false;
           await _isar.memberModels.put(member); 
         }
       });

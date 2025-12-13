@@ -192,6 +192,7 @@ MemberModel _memberModelDeserialize(
     firstName: reader.readString(offsets[4]),
     id: reader.readString(offsets[5]),
     isDeleted: reader.readBoolOrNull(offsets[6]) ?? false,
+    isarId: id,
     lastAttendanceDate: reader.readDateTimeOrNull(offsets[7]),
     lastName: reader.readString(offsets[8]),
     notes: reader.readStringOrNull(offsets[9]),
@@ -280,7 +281,9 @@ List<IsarLinkBase<dynamic>> _memberModelGetLinks(MemberModel object) {
 }
 
 void _memberModelAttach(
-    IsarCollection<dynamic> col, Id id, MemberModel object) {}
+    IsarCollection<dynamic> col, Id id, MemberModel object) {
+  object.isarId = id;
+}
 
 extension MemberModelByIndex on IsarCollection<MemberModel> {
   Future<MemberModel?> getById(String id) {

@@ -72,29 +72,58 @@ class _MemberFormPageState extends State<MemberFormPage> {
 
   void _save() {
     if (_formKey.currentState?.validate() ?? false) {
-      // GENERATE UUID V4 for new members (String)
-      // If editing, keep existing ID.
-      final String id = widget.member?.id ?? const Uuid().v4();
-      
-      final member = Member(
-        id: id,
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-        role: _role,
-        status: _status,
-        civilStatus: _civilStatus,
-        dateOfBirth: _dateOfBirth,
-        notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
-        createdAt: widget.member?.createdAt ?? DateTime.now(), 
-        updatedAt: DateTime.now(),
-        isDeleted: widget.member?.isDeleted ?? false,
-      );
-      
-      print('DEBUG: Guardando Miembro con ID: $id (Es uuid: ${widget.member?.id == null})');
+      final firstName = _firstNameController.text.trim();
+      final lastName = _lastNameController.text.trim();
+      final phone = _phoneController.text.trim();
+      final address = _addressController.text.trim().isEmpty ? null : _addressController.text.trim();
+      final notes = _notesController.text.trim().isEmpty ? null : _notesController.text.trim();
 
-      context.read<MembersBloc>().add(MembersEvent.addMember(member));
+      if (widget.member == null) {
+        // --- CREACION: NUEVO ID OBLIGATORIO ---
+        final newId = const Uuid().v4();
+        print('DEBUG: Creating NEW member with ID: $newId');
+
+        final newMember = Member(
+          id: newId,
+          firstName: firstName,
+          lastName: lastName,
+          phone: phone,
+          address: address,
+          role: _role,
+          status: _status,
+          civilStatus: _civilStatus,
+          dateOfBirth: _dateOfBirth,
+          notes: notes,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          isDeleted: false,
+        );
+        context.read<MembersBloc>().add(MembersEvent.addMember(newMember));
+
+      } else {
+        // --- EDICION: MANTENER ID EXISTENTE ---
+        final existingId = widget.member!.id!;
+        print('DEBUG: Updating EXISTING member with ID: $existingId');
+
+        final updatedMember = Member(
+          id: existingId,
+          firstName: firstName,
+          lastName: lastName,
+          phone: phone,
+          address: address,
+          role: _role,
+          status: _status,
+          civilStatus: _civilStatus,
+          dateOfBirth: _dateOfBirth,
+          notes: notes,
+          createdAt: widget.member!.createdAt,
+          updatedAt: DateTime.now(),
+          isDeleted: widget.member!.isDeleted,
+        );
+        // Repository's saveMember handles upsert, so we reuse AddMember event
+        // (or ideally we'd have an UpdateMember event for clarity, but this works)
+        context.read<MembersBloc>().add(MembersEvent.addMember(updatedMember));
+      }
     }
   }
   

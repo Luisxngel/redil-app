@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/services/pdf_service.dart';
 import '../../../../core/services/statistics_service.dart';
 import '../../../../core/utils/enum_extensions.dart';
 import '../../domain/entities/member.dart';
@@ -15,10 +17,17 @@ class MemberProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Match Dashboard bg
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: const Text('Perfil de Miembro'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: 'Exportar Reporte',
+            onPressed: () => _onExport(context),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -35,39 +44,86 @@ class MemberProfilePage extends StatelessWidget {
     );
   }
 
+  Future<void> _onExport(BuildContext context) async {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Generando reporte PDF...')),
+    );
+
+    try {
+      final statsService = getIt<StatisticsService>();
+      final stats = await statsService.getMemberStats(member.id!);
+      
+      // We need the history list for the PDF
+      // The service call getMemberHistory returns List<Map>, but PDF needs List<Attendance> or similar.
+      // StatisticsService.getMemberHistory returns List<Map>, not the raw entities.
+      // However, we can fetch the raw history from the repo if exposed, OR just use the Map data if we adjust the PdfService.
+      // Wait, PdfService defined above expects List<Attendance>. 
+      // But we don't have easy access to List<Attendance> from here without a Repo call or new Service method.
+      // Let's modify PdfService to accept List<Map<String, dynamic>> for history to be simpler and reuse existing service methods.
+      // Refactoring PdfService signature in next tool call.
+      
+      // WAIT. I can just fetch the raw history if I had the AttendanceRepo.
+      // BUT `StatisticsService` encapsulates that.
+      // Better approach: Let's assume for now I will modify PdfService to take the List<Map> from getMemberHistory.
+      // It serves the same purpose.
+      
+      final historyMap = await statsService.getMemberHistory(member.id!);
+      
+      // Generate
+      final pdfService = getIt<PdfService>();
+      final file = await pdfService.generateMemberDossier(member, stats, historyMap);
+      
+      if (context.mounted) {
+         Share.shareXFiles([XFile(file.path)], text: 'Reporte de ${member.firstName} ${member.lastName}');
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al generar reporte: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
+  }
+
   Widget _buildHeader(BuildContext context) {
     return FutureBuilder<Map<String, dynamic>>(
       future: getIt<StatisticsService>().getMemberStats(member.id!),
       builder: (context, snapshot) {
         // Default to grey if loading
         Color ringColor = Colors.grey;
+        int extraCount = 0; 
+
         if (snapshot.hasData) {
-          final percentage = snapshot.data!['percentage'] as double;
-          // Exact same logic as Tile
+          final stats = snapshot.data!;
+          final percentage = stats['percentage'] as double;
+          final status = stats['status'] as String? ?? 'ACTIVE';
+          extraCount = stats['extraCount'] as int? ?? 0;
+
           if (member.status == MemberStatus.suspended) {
              ringColor = Colors.red;
           } else if (member.status == MemberStatus.inactive) {
              ringColor = Colors.grey;
+          } else if (status == 'NEUTRAL') {
+             ringColor = Colors.grey; 
           } else if (percentage < 50) {
              ringColor = Colors.red;
           } else {
              ringColor = Colors.green;
           }
         } else if (member.status == MemberStatus.active) {
-            // Optimistic active
             ringColor = Colors.green;
         }
 
         return Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(4), // Ring thickness
+              padding: const EdgeInsets.all(4), 
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(color: ringColor, width: 3),
               ),
               child: CircleAvatar(
-                radius: 50, // Giant Avatar
+                radius: 50, 
                 backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
                 child: Text(
                   member.firstName.substring(0, 1).toUpperCase(),
@@ -89,6 +145,29 @@ class MemberProfilePage extends StatelessWidget {
               member.role.label.toUpperCase(),
               style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
             ),
+             if (extraCount > 0) ...[
+                const SizedBox(height: 8),
+                Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                   decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.amber.shade200),
+                   ),
+                   child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                         Icon(Icons.star_rate_rounded, size: 14, color: Colors.amber.shade800),
+                         const SizedBox(width: 4),
+                         Text('+$extraCount Extras', style: TextStyle(
+                            fontSize: 12, 
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber.shade900
+                         )),
+                      ],
+                   ),
+                ),
+             ],
             const SizedBox(height: 4),
             Text(
               member.phone,
@@ -99,7 +178,7 @@ class MemberProfilePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton.filledTonal(
-                  onPressed: () {}, // TODO: Implement call
+                  onPressed: () {}, 
                   icon: const Icon(Icons.call),
                   tooltip: 'Llamar',
                 ),

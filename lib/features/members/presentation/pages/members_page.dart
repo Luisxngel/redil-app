@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:grouped_list/grouped_list.dart';
 import '../../domain/entities/member.dart';
+import 'package:share_plus/share_plus.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/services/pdf_service.dart';
+import '../../../../core/services/statistics_service.dart';
 import '../../../../core/utils/enum_extensions.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/theme/theme_cubit.dart';
@@ -39,6 +43,11 @@ class _MembersPageState extends State<MembersPage> {
                 const SnackBar(content: Text('Sin notificaciones nuevas')),
               );
             },
+          ),
+          IconButton(
+            icon: const Icon(Icons.print),
+            tooltip: 'Imprimir Reporte General',
+            onPressed: () => _onPrintBattalionReport(context),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -178,6 +187,60 @@ class _MembersPageState extends State<MembersPage> {
       ),
     );
   }
+  Future<void> _onPrintBattalionReport(BuildContext context) async {
+     ScaffoldMessenger.of(context).showSnackBar(
+       const SnackBar(content: Text('Generando Estado de Fuerza...')),
+     );
+
+     try {
+       // 1. Get Members from Bloc State (or Repo)
+       final state = context.read<MembersBloc>().state;
+       final members = state.maybeWhen(
+         loaded: (m) => m,
+         orElse: () => <Member>[],
+       );
+
+       if (members.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No hay miembros para reportar')),
+          );
+          return;
+       }
+
+       // 2. Fetch Stats for ALL members
+       final statsService = getIt<StatisticsService>();
+       final Map<String, Map<String, dynamic>> allStats = {};
+
+       // We could do this in parallel, but for safety in sequence or Future.wait
+       // Future.wait might be too heavy if many members, but for < 100 it's fine.
+       final futures = members.map((m) async {
+          final stats = await statsService.getMemberStats(m.id!);
+          return MapEntry(m.id!, stats);
+       });
+       
+       final results = await Future.wait(futures);
+       for (var entry in results) {
+         allStats[entry.key] = entry.value;
+       }
+
+       // 3. Generate PDF
+       final pdfService = getIt<PdfService>();
+       final file = await pdfService.generateBattalionReport(members, allStats);
+
+       // 4. Share
+       if (context.mounted) {
+         Share.shareXFiles([XFile(file.path)], text: 'Estado de Fuerza - REDIL');
+       }
+
+     } catch (e) {
+       if (context.mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+         );
+       }
+     }
+  }
+
   void _showThemeDialog(BuildContext context) {
     showDialog(
       context: context,

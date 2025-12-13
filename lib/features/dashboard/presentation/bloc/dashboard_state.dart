@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../members/domain/entities/member.dart';
+import '../../../members/domain/entities/member_risk.dart';
 
 part 'dashboard_state.freezed.dart';
 
@@ -11,7 +12,7 @@ class DashboardState with _$DashboardState {
     required int activeCount,
     required double attendanceAverage,
     required List<Member> birthdayMembers,
-    required List<Member> riskMembers,
+    required List<MemberRisk> riskMembers,
   }) = DashboardLoaded;
   const factory DashboardState.error(String message) = _Error;
 }

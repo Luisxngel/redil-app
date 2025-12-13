@@ -11,6 +11,7 @@ import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
 import '../../../members/domain/entities/member.dart';
+import '../../../members/domain/entities/member_risk.dart'; // NEW
 import '../../../members/presentation/widgets/whatsapp_message_dialog.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -251,11 +252,10 @@ class _DashboardView extends StatelessWidget {
     );
   }
 
-  Widget _buildAttritionList(BuildContext context, List<Member> members) {
+  Widget _buildAttritionList(BuildContext context, List<MemberRisk> riskItems) {
     return Card(
       elevation: 2,
-      color: Colors.white, // User requested white card for this section in prompt, or at least consistent with others. The code used orange.shade50.
-      // "Below it, one large white rounded card". Okay, I will change to white.
+      color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
@@ -266,10 +266,9 @@ class _DashboardView extends StatelessWidget {
                 Icon(Icons.warning_amber_rounded, color: Colors.orange.shade800),
                 const SizedBox(width: 8),
                 Text(
-                  'Atención necesaria (${members.length})', 
+                  'Atención necesaria (${riskItems.length})', 
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    // color: Colors.orange.shade900, // Removed orange for title
                   ),
                 ),
               ],
@@ -279,27 +278,24 @@ class _DashboardView extends StatelessWidget {
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: members.length,
+            itemCount: riskItems.length,
             itemBuilder: (context, index) {
-              final member = members[index];
+              final item = riskItems[index];
+              final member = item.member;
+              final absences = item.consecutiveAbsences;
+
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.grey[200], // "dark gray circular avatar" - maybe grey[700] background with white text? Or grey avatar.
-                  // Reference says: "Left: A dark gray circular avatar with a white initial"
-                  // Let's try Colors.grey[700] for bg and white text.
+                  backgroundColor: Colors.grey[200],
                   child: Text(
                     member.firstName.substring(0, 1).toUpperCase(),
-                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold), // Or white if bg is dark.
+                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                   ),
-                  // Current code was white bg with orange text.
-                  // I will stick to a neutral look if not specified, but user said "dark gray circular avatar".
-                  // Let's use Colors.grey[300] and black text for safety or Colors.grey[700] and white.
-                  // I'll stick to a clean look: Colors.grey[200] background.
                 ),
                 title: Text('${member.firstName} ${member.lastName}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Ausentes en últimos 3 eventos', style: TextStyle(color: Colors.grey)),
+                subtitle: Text('Ausente ($absences)', style: const TextStyle(color: Colors.grey)),
                 trailing: IconButton(
-                  icon: const Icon(Icons.chat_bubble, color: Colors.green), // 5. Green WhatsApp Icon
+                  icon: const Icon(Icons.message_rounded, color: Colors.green), // 5. Modern Message Icon
                   onPressed: () {
                     showDialog(
                       context: context,

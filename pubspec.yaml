@@ -52,6 +52,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flex_color_scheme: ^8.4.0
+  pdf: ^3.11.3
+  share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:

@@ -144,11 +144,11 @@ class _AttendanceFormViewState extends State<_AttendanceFormView> {
                       helperText: 'Define quiénes deben asistir obligatoriamente',
                     ),
                     items: const [
-                      DropdownMenuItem(value: 'ALL', child: Text('Todo el Redil (Obligatorio)')),
+                      DropdownMenuItem(value: 'ALL', child: Text('Todos el Redil')),
                       DropdownMenuItem(value: 'LIDER', child: Text('Solo Líderes')),
                       DropdownMenuItem(value: 'MEMBER', child: Text('Solo Miembros')),
-                      DropdownMenuItem(value: 'OPTIONAL', child: Text('Opcional / Libre')),
-                      DropdownMenuItem(value: 'MANUAL', child: Text('Selección Manual')),
+                      // OPTIONAL removed as per UX change
+                      DropdownMenuItem(value: 'MANUAL', child: Text('Selección Manual / Opcional')),
                     ],
                     onChanged: (val) {
                       if (val != null) {
@@ -160,7 +160,7 @@ class _AttendanceFormViewState extends State<_AttendanceFormView> {
                   // MANUAL SELECTION LIST
                   if (_targetRole == 'MANUAL') ...[
                     const SizedBox(height: 16),
-                    const Text('Seleccionar Invitados:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const Text('Seleccionar Invitados (Dejar vacío para evento opcional):', style: TextStyle(fontWeight: FontWeight.bold)),
                     Container(
                       height: 300,
                       decoration: BoxDecoration(
@@ -205,11 +205,14 @@ class _AttendanceFormViewState extends State<_AttendanceFormView> {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () {
+                         final invitedIds = (_targetRole == 'MANUAL') ? _invitedIds.toList() : <String>[];
+                         debugPrint('DEBUG SUBMIT: Role=$_targetRole, Invitados=${invitedIds.length}');
+
                          context.read<AttendanceBloc>().add(AttendanceEvent.saveEvent(
                            date: _selectedDate,
                            description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
                            targetRole: _targetRole,
-                           invitedMemberIds: _invitedIds.toList(),
+                           invitedMemberIds: invitedIds,
                          ));
                       },
                     ),

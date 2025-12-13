@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/services/statistics_service.dart';
 import '../../../members/domain/entities/member.dart';
+import '../../../members/domain/entities/member_risk.dart';
 import 'dashboard_event.dart';
 import 'dashboard_state.dart';
 import '../../../attendance/domain/repositories/attendance_repository.dart';
@@ -43,7 +44,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         activeCount: results[0] as int,
         attendanceAverage: results[1] as double,
         birthdayMembers: results[2] as List<Member>,
-        riskMembers: results[3] as List<Member>,
+        riskMembers: results[3] as List<MemberRisk>,
       ));
     } catch (e) {
       emit(DashboardState.error("Error cargando dashboard: $e"));

@@ -21,7 +21,7 @@ mixin _$DashboardState {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) =>
@@ -31,7 +31,7 @@ mixin _$DashboardState {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) =>
@@ -41,7 +41,7 @@ mixin _$DashboardState {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -133,7 +133,7 @@ class _$InitialImpl implements _Initial {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -146,7 +146,7 @@ class _$InitialImpl implements _Initial {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -159,7 +159,7 @@ class _$InitialImpl implements _Initial {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -253,7 +253,7 @@ class _$LoadingImpl implements _Loading {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -266,7 +266,7 @@ class _$LoadingImpl implements _Loading {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -279,7 +279,7 @@ class _$LoadingImpl implements _Loading {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -342,7 +342,7 @@ abstract class _$$DashboardLoadedImplCopyWith<$Res> {
       {int activeCount,
       double attendanceAverage,
       List<Member> birthdayMembers,
-      List<Member> riskMembers});
+      List<MemberRisk> riskMembers});
 }
 
 /// @nodoc
@@ -377,7 +377,7 @@ class __$$DashboardLoadedImplCopyWithImpl<$Res>
       riskMembers: null == riskMembers
           ? _value._riskMembers
           : riskMembers // ignore: cast_nullable_to_non_nullable
-              as List<Member>,
+              as List<MemberRisk>,
     ));
   }
 }
@@ -389,7 +389,7 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
       {required this.activeCount,
       required this.attendanceAverage,
       required final List<Member> birthdayMembers,
-      required final List<Member> riskMembers})
+      required final List<MemberRisk> riskMembers})
       : _birthdayMembers = birthdayMembers,
         _riskMembers = riskMembers;
 
@@ -405,9 +405,9 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
     return EqualUnmodifiableListView(_birthdayMembers);
   }
 
-  final List<Member> _riskMembers;
+  final List<MemberRisk> _riskMembers;
   @override
-  List<Member> get riskMembers {
+  List<MemberRisk> get riskMembers {
     if (_riskMembers is EqualUnmodifiableListView) return _riskMembers;
     // ignore: implicit_dynamic_type
     return EqualUnmodifiableListView(_riskMembers);
@@ -454,7 +454,7 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -467,7 +467,7 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -481,7 +481,7 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -536,12 +536,12 @@ abstract class DashboardLoaded implements DashboardState {
       {required final int activeCount,
       required final double attendanceAverage,
       required final List<Member> birthdayMembers,
-      required final List<Member> riskMembers}) = _$DashboardLoadedImpl;
+      required final List<MemberRisk> riskMembers}) = _$DashboardLoadedImpl;
 
   int get activeCount;
   double get attendanceAverage;
   List<Member> get birthdayMembers;
-  List<Member> get riskMembers;
+  List<MemberRisk> get riskMembers;
   @JsonKey(ignore: true)
   _$$DashboardLoadedImplCopyWith<_$DashboardLoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -614,7 +614,7 @@ class _$ErrorImpl implements _Error {
     required TResult Function() initial,
     required TResult Function() loading,
     required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -627,7 +627,7 @@ class _$ErrorImpl implements _Error {
     TResult? Function()? initial,
     TResult? Function()? loading,
     TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -640,7 +640,7 @@ class _$ErrorImpl implements _Error {
     TResult Function()? initial,
     TResult Function()? loading,
     TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<Member> riskMembers)?
+            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),

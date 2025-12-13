@@ -25,6 +25,8 @@ class MemberTile extends StatelessWidget {
         final stats = snapshot.data ?? {'percentage': 0.0};
         final percentage = stats['percentage'] as double;
         final history = stats['history'] as List<Map<String, dynamic>>? ?? [];
+        final status = stats['status'] as String? ?? 'ACTIVE';
+        final extraCount = stats['extraCount'] as int? ?? 0;
 
         return Card(
           elevation: 0.5,
@@ -38,7 +40,7 @@ class MemberTile extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: _getStatusColor(member, percentage),
+                  color: _getStatusColor(member, percentage, status),
                   width: 2.5,
                 ),
               ),
@@ -61,6 +63,11 @@ class MemberTile extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
                 ),
+                  if (extraCount > 0)
+                     Padding(
+                       padding: const EdgeInsets.only(right: 8.0),
+                       child: Icon(Icons.star_rate_rounded, size: 16, color: Colors.amber.shade800),
+                     ),
                   if (_isBirthdayToday(member.dateOfBirth))
                     Icon(Icons.cake, color: Theme.of(context).colorScheme.secondary, size: 20),
               ],
@@ -71,19 +78,26 @@ class MemberTile extends StatelessWidget {
                 children: [
                   TextSpan(text: member.role.label.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w500)),
                   const TextSpan(text: '  |  '),
-                  TextSpan(
-                    text: '${percentage.toStringAsFixed(0)}%',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: percentage < 50 ? Colors.red : Theme.of(context).primaryColor,
+                  if (status == 'NEUTRAL')
+                    const TextSpan(
+                      text: '--', 
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)
+                    )
+                  else
+                    TextSpan(
+                      text: '${percentage.toStringAsFixed(0)}%',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: percentage < 50 ? Colors.red : Theme.of(context).primaryColor,
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                // ... buttons ...
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.grey),
                     onPressed: () {
@@ -115,9 +129,10 @@ class MemberTile extends StatelessWidget {
     );
   }
 
-  Color _getStatusColor(Member member, double percentage) {
+  Color _getStatusColor(Member member, double percentage, String status) {
     if (member.status == MemberStatus.suspended) return Colors.red;
     if (member.status == MemberStatus.inactive) return Colors.grey;
+    if (status == 'NEUTRAL') return Colors.grey.withOpacity(0.5);
     
     // Heuristic: If percentage < 50% -> Warning/Red
     if (percentage < 50) return Colors.red;
@@ -223,6 +238,7 @@ class MemberTile extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
+
               context.read<MembersBloc>().add(MembersEvent.deleteMember(member.id!));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),

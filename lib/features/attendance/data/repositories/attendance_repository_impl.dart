@@ -26,7 +26,24 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   Future<Either<Failure, void>> saveAttendance(Attendance attendance) async {
     try {
       final model = AttendanceModel.fromEntity(attendance);
+      
       await _isar.writeTxn(() async {
+        // FIX: Data Corruption Prevention (P0)
+        // Read existing record to preserve critical fields that might be lost in partial updates
+        final existing = await _isar.attendanceModels.get(model.isarId);
+        
+        if (existing != null) {
+          // 1. Preserve Target Role if it was reset to default 'ALL'
+          if (model.targetRole == 'ALL' && existing.targetRole != 'ALL') {
+            model.targetRole = existing.targetRole;
+          }
+          
+          // 2. Preserve Invited List if it was wiped out
+          if (model.invitedMemberIds.isEmpty && existing.invitedMemberIds.isNotEmpty) {
+             model.invitedMemberIds = List<String>.from(existing.invitedMemberIds);
+          }
+        }
+
         await _isar.attendanceModels.put(model);
       });
       return const Right(null);

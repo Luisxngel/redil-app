@@ -54,6 +54,7 @@ dependencies:
   flex_color_scheme: ^8.4.0
   pdf: ^3.11.3
   share_plus: ^12.0.1
+  table_calendar: ^3.0.9 # NEW
 
 dev_dependencies:
   flutter_test:

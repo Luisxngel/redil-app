@@ -13,6 +13,7 @@ import '../bloc/dashboard_state.dart';
 import '../../../members/domain/entities/member.dart';
 import '../../../members/domain/entities/member_risk.dart'; // NEW
 import '../../../members/presentation/widgets/whatsapp_message_dialog.dart';
+import '../widgets/dashboard_calendar.dart'; // NEW
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -109,6 +110,10 @@ class _DashboardView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 0. Calendar (NEW)
+                    const DashboardCalendar(),
+                    const SizedBox(height: 24),
+
                     // 1. Resumen Operativo (KPIS)
                     _buildSummaryGrid(context, activeCount, avgAttendance),
                     const SizedBox(height: 24),

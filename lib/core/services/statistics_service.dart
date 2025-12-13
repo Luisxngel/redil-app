@@ -68,6 +68,7 @@ class StatisticsService {
       int consecutiveAbsences = 0;
 
       for (var event in history) {
+        if (event.date.isAfter(DateTime.now())) continue; // FIX
         final isMandatory = _isMandatoryFor(member, event);
         if (isMandatory) {
           final attended = event.presentMemberIds.contains(member.id);
@@ -146,6 +147,7 @@ class StatisticsService {
         'description': event.description ?? 'Reunión General',
         'attended': attended,
         'isOptional': event.targetRole == 'OPTIONAL',
+        'isFuture': event.date.isAfter(DateTime.now()),
       };
     }).toList();
   }
@@ -171,6 +173,9 @@ class StatisticsService {
     int extraAttended = 0;
 
     for (var event in history) {
+      // FIX: Ignore future events for statistics
+      if (event.date.isAfter(DateTime.now())) continue;
+
       print('LOOP Processing: ${event.description} for ${member?.firstName}'); // DEBUG
       final attended = event.presentMemberIds.contains(memberId);
       
@@ -225,6 +230,7 @@ class StatisticsService {
         'date': event.date,
         'description': event.description ?? 'Reunión General',
         'attended': event.presentMemberIds.contains(memberId),
+        'isFuture': event.date.isAfter(DateTime.now()),
       };
     }).toList();
 

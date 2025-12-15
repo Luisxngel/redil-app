@@ -38,6 +38,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         _statsService.getAverageAttendance(),
         _statsService.getUpcomingBirthdays(),
         _statsService.getAttritionRiskMembers(),
+        _statsService.getLastEventAttendanceCount(), // Index 4
+        _statsService.getHarvestCount(), // Index 5
+        _statsService.getLastEventAttendees(), // Index 6
+        _statsService.getHarvestMembers(), // Index 7
       ]);
 
       emit(DashboardState.loaded(
@@ -45,6 +49,10 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         attendanceAverage: results[1] as double,
         birthdayMembers: results[2] as List<Member>,
         riskMembers: results[3] as List<MemberRisk>,
+        lastEventAttendance: results[4] as int,
+        harvestCount: results[5] as int,
+        lastAttendees: results[6] as List<Member>,
+        harvestMembers: results[7] as List<Member>,
       ));
     } catch (e) {
       emit(DashboardState.error("Error cargando dashboard: $e"));

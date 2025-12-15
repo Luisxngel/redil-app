@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../../members/domain/entities/member.dart';
 import '../../domain/entities/attendance.dart';
+import '../models/attendance_group.dart';
 
 part 'attendance_state.freezed.dart';
 
@@ -9,7 +10,10 @@ class AttendanceState with _$AttendanceState {
   const factory AttendanceState.initial() = _Initial;
   const factory AttendanceState.loading() = _Loading;
   
-  const factory AttendanceState.historyLoaded(List<Attendance> history) = HistoryLoaded;
+  const factory AttendanceState.historyLoaded({
+    required List<Attendance> history,
+    required List<AttendanceGroup> scheduled,
+  }) = HistoryLoaded;
   
   const factory AttendanceState.formLoaded({
     Attendance? existingEvent, // Null if new

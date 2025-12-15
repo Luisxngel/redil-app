@@ -23,6 +23,8 @@ class Member extends Equatable {
   final CivilStatus? civilStatus;
   final String? notes;
   final bool isDeleted;
+  final bool isHarvested; 
+  final DateTime? lastContacted; // NEW: Track last interaction
 
   const Member({
     this.id,
@@ -39,6 +41,8 @@ class Member extends Equatable {
     this.civilStatus,
     this.notes,
     this.isDeleted = false,
+    this.isHarvested = false,
+    this.lastContacted,
   });
 
   @override
@@ -57,6 +61,8 @@ class Member extends Equatable {
         civilStatus,
         notes,
         isDeleted,
+        isHarvested,
+        lastContacted,
       ];
 
   // Business Logic / Validation could go here or in UseCases/ValueObjects
@@ -66,5 +72,43 @@ class Member extends Equatable {
   static bool isValidPhone(String phone) {
     // Allows numbers and + symbol
     return RegExp(r'^[0-9+]+$').hasMatch(phone);
+  }
+
+  Member copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? phone,
+    MemberRole? role,
+    MemberStatus? status,
+    DateTime? lastAttendanceDate,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    DateTime? dateOfBirth,
+    String? address,
+    CivilStatus? civilStatus,
+    String? notes,
+    bool? isDeleted,
+    bool? isHarvested,
+    DateTime? lastContacted,
+  }) {
+    return Member(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phone: phone ?? this.phone,
+      role: role ?? this.role,
+      status: status ?? this.status,
+      lastAttendanceDate: lastAttendanceDate ?? this.lastAttendanceDate,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+      address: address ?? this.address,
+      civilStatus: civilStatus ?? this.civilStatus,
+      notes: notes ?? this.notes,
+      isDeleted: isDeleted ?? this.isDeleted,
+      isHarvested: isHarvested ?? this.isHarvested,
+      lastContacted: lastContacted ?? this.lastContacted,
+    );
   }
 }

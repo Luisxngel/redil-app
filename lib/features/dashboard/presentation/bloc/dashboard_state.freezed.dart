@@ -20,8 +20,15 @@ mixin _$DashboardState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
+    required TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) =>
@@ -30,8 +37,15 @@ mixin _$DashboardState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult? Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) =>
@@ -40,8 +54,15 @@ mixin _$DashboardState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -132,8 +153,15 @@ class _$InitialImpl implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
+    required TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -145,8 +173,15 @@ class _$InitialImpl implements _Initial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult? Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -158,8 +193,15 @@ class _$InitialImpl implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -252,8 +294,15 @@ class _$LoadingImpl implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
+    required TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -265,8 +314,15 @@ class _$LoadingImpl implements _Loading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult? Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -278,8 +334,15 @@ class _$LoadingImpl implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
@@ -341,6 +404,10 @@ abstract class _$$DashboardLoadedImplCopyWith<$Res> {
   $Res call(
       {int activeCount,
       double attendanceAverage,
+      int lastEventAttendance,
+      List<Member> lastAttendees,
+      int harvestCount,
+      List<Member> harvestMembers,
       List<Member> birthdayMembers,
       List<MemberRisk> riskMembers});
 }
@@ -358,6 +425,10 @@ class __$$DashboardLoadedImplCopyWithImpl<$Res>
   $Res call({
     Object? activeCount = null,
     Object? attendanceAverage = null,
+    Object? lastEventAttendance = null,
+    Object? lastAttendees = null,
+    Object? harvestCount = null,
+    Object? harvestMembers = null,
     Object? birthdayMembers = null,
     Object? riskMembers = null,
   }) {
@@ -370,6 +441,22 @@ class __$$DashboardLoadedImplCopyWithImpl<$Res>
           ? _value.attendanceAverage
           : attendanceAverage // ignore: cast_nullable_to_non_nullable
               as double,
+      lastEventAttendance: null == lastEventAttendance
+          ? _value.lastEventAttendance
+          : lastEventAttendance // ignore: cast_nullable_to_non_nullable
+              as int,
+      lastAttendees: null == lastAttendees
+          ? _value._lastAttendees
+          : lastAttendees // ignore: cast_nullable_to_non_nullable
+              as List<Member>,
+      harvestCount: null == harvestCount
+          ? _value.harvestCount
+          : harvestCount // ignore: cast_nullable_to_non_nullable
+              as int,
+      harvestMembers: null == harvestMembers
+          ? _value._harvestMembers
+          : harvestMembers // ignore: cast_nullable_to_non_nullable
+              as List<Member>,
       birthdayMembers: null == birthdayMembers
           ? _value._birthdayMembers
           : birthdayMembers // ignore: cast_nullable_to_non_nullable
@@ -388,16 +475,49 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
   const _$DashboardLoadedImpl(
       {required this.activeCount,
       required this.attendanceAverage,
+      required this.lastEventAttendance,
+      required final List<Member> lastAttendees,
+      required this.harvestCount,
+      required final List<Member> harvestMembers,
       required final List<Member> birthdayMembers,
       required final List<MemberRisk> riskMembers})
-      : _birthdayMembers = birthdayMembers,
+      : _lastAttendees = lastAttendees,
+        _harvestMembers = harvestMembers,
+        _birthdayMembers = birthdayMembers,
         _riskMembers = riskMembers;
 
   @override
   final int activeCount;
   @override
   final double attendanceAverage;
+  @override
+  final int lastEventAttendance;
+// Derived or kept for ease
+  final List<Member> _lastAttendees;
+// Derived or kept for ease
+  @override
+  List<Member> get lastAttendees {
+    if (_lastAttendees is EqualUnmodifiableListView) return _lastAttendees;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_lastAttendees);
+  }
+
+// NEW
+  @override
+  final int harvestCount;
+// Derived or kept
+  final List<Member> _harvestMembers;
+// Derived or kept
+  @override
+  List<Member> get harvestMembers {
+    if (_harvestMembers is EqualUnmodifiableListView) return _harvestMembers;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_harvestMembers);
+  }
+
+// NEW
   final List<Member> _birthdayMembers;
+// NEW
   @override
   List<Member> get birthdayMembers {
     if (_birthdayMembers is EqualUnmodifiableListView) return _birthdayMembers;
@@ -415,7 +535,7 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
 
   @override
   String toString() {
-    return 'DashboardState.loaded(activeCount: $activeCount, attendanceAverage: $attendanceAverage, birthdayMembers: $birthdayMembers, riskMembers: $riskMembers)';
+    return 'DashboardState.loaded(activeCount: $activeCount, attendanceAverage: $attendanceAverage, lastEventAttendance: $lastEventAttendance, lastAttendees: $lastAttendees, harvestCount: $harvestCount, harvestMembers: $harvestMembers, birthdayMembers: $birthdayMembers, riskMembers: $riskMembers)';
   }
 
   @override
@@ -427,6 +547,14 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
                 other.activeCount == activeCount) &&
             (identical(other.attendanceAverage, attendanceAverage) ||
                 other.attendanceAverage == attendanceAverage) &&
+            (identical(other.lastEventAttendance, lastEventAttendance) ||
+                other.lastEventAttendance == lastEventAttendance) &&
+            const DeepCollectionEquality()
+                .equals(other._lastAttendees, _lastAttendees) &&
+            (identical(other.harvestCount, harvestCount) ||
+                other.harvestCount == harvestCount) &&
+            const DeepCollectionEquality()
+                .equals(other._harvestMembers, _harvestMembers) &&
             const DeepCollectionEquality()
                 .equals(other._birthdayMembers, _birthdayMembers) &&
             const DeepCollectionEquality()
@@ -438,6 +566,10 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
       runtimeType,
       activeCount,
       attendanceAverage,
+      lastEventAttendance,
+      const DeepCollectionEquality().hash(_lastAttendees),
+      harvestCount,
+      const DeepCollectionEquality().hash(_harvestMembers),
       const DeepCollectionEquality().hash(_birthdayMembers),
       const DeepCollectionEquality().hash(_riskMembers));
 
@@ -453,12 +585,27 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
+    required TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
-    return loaded(activeCount, attendanceAverage, birthdayMembers, riskMembers);
+    return loaded(
+        activeCount,
+        attendanceAverage,
+        lastEventAttendance,
+        lastAttendees,
+        harvestCount,
+        harvestMembers,
+        birthdayMembers,
+        riskMembers);
   }
 
   @override
@@ -466,13 +613,27 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult? Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
     return loaded?.call(
-        activeCount, attendanceAverage, birthdayMembers, riskMembers);
+        activeCount,
+        attendanceAverage,
+        lastEventAttendance,
+        lastAttendees,
+        harvestCount,
+        harvestMembers,
+        birthdayMembers,
+        riskMembers);
   }
 
   @override
@@ -480,15 +641,29 @@ class _$DashboardLoadedImpl implements DashboardLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),
   }) {
     if (loaded != null) {
       return loaded(
-          activeCount, attendanceAverage, birthdayMembers, riskMembers);
+          activeCount,
+          attendanceAverage,
+          lastEventAttendance,
+          lastAttendees,
+          harvestCount,
+          harvestMembers,
+          birthdayMembers,
+          riskMembers);
     }
     return orElse();
   }
@@ -535,11 +710,19 @@ abstract class DashboardLoaded implements DashboardState {
   const factory DashboardLoaded(
       {required final int activeCount,
       required final double attendanceAverage,
+      required final int lastEventAttendance,
+      required final List<Member> lastAttendees,
+      required final int harvestCount,
+      required final List<Member> harvestMembers,
       required final List<Member> birthdayMembers,
       required final List<MemberRisk> riskMembers}) = _$DashboardLoadedImpl;
 
   int get activeCount;
   double get attendanceAverage;
+  int get lastEventAttendance; // Derived or kept for ease
+  List<Member> get lastAttendees; // NEW
+  int get harvestCount; // Derived or kept
+  List<Member> get harvestMembers; // NEW
   List<Member> get birthdayMembers;
   List<MemberRisk> get riskMembers;
   @JsonKey(ignore: true)
@@ -613,8 +796,15 @@ class _$ErrorImpl implements _Error {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)
+    required TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)
         loaded,
     required TResult Function(String message) error,
   }) {
@@ -626,8 +816,15 @@ class _$ErrorImpl implements _Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult? Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult? Function(String message)? error,
   }) {
@@ -639,8 +836,15 @@ class _$ErrorImpl implements _Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(int activeCount, double attendanceAverage,
-            List<Member> birthdayMembers, List<MemberRisk> riskMembers)?
+    TResult Function(
+            int activeCount,
+            double attendanceAverage,
+            int lastEventAttendance,
+            List<Member> lastAttendees,
+            int harvestCount,
+            List<Member> harvestMembers,
+            List<Member> birthdayMembers,
+            List<MemberRisk> riskMembers)?
         loaded,
     TResult Function(String message)? error,
     required TResult orElse(),

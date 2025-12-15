@@ -178,8 +178,9 @@ class MemberTile extends StatelessWidget {
               if (history.isEmpty)
                 const Text('Sin historial reciente.', style: TextStyle(color: Colors.grey)),
               ...history.take(5).map((event) {
-                final attended = event['attended'] as bool;
                 final date = event['date'] as DateTime;
+                final bool isFuture = date.isAfter(DateTime.now());
+                final attended = event['attended'] as bool;
                 final description = event['description'] as String? ?? 'Evento';
 
                 return Padding(
@@ -187,16 +188,24 @@ class MemberTile extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        attended ? Icons.check_circle_outline : Icons.cancel_outlined,
-                        color: attended ? Colors.green : Colors.red,
+                        isFuture 
+                           ? Icons.access_time_rounded 
+                           : (attended ? Icons.check_circle_outline : Icons.cancel_outlined),
+                        color: isFuture 
+                           ? Colors.grey 
+                           : (attended ? Colors.green : Colors.red),
                         size: 20,
                       ),
                       const SizedBox(width: 8),
                       // Extract Date
                       Expanded(
                         child: Text(
-                           '${DateFormat('dd/MM').format(date)} - $description',
-                           style: const TextStyle(fontSize: 13),
+                           '${DateFormat('dd/MM').format(date)} - $description ${isFuture ? "(Pendiente)" : ""}',
+                           style: TextStyle(
+                             fontSize: 13, 
+                             color: isFuture ? Colors.grey : null,
+                             fontStyle: isFuture ? FontStyle.italic : null
+                           ),
                            overflow: TextOverflow.ellipsis,
                         ),
                       ),

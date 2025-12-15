@@ -42,9 +42,19 @@ const AttendanceModelSchema = CollectionSchema(
       name: r'presentMemberIds',
       type: IsarType.stringList,
     ),
-    r'targetRole': PropertySchema(
+    r'seriesId': PropertySchema(
       id: 5,
+      name: r'seriesId',
+      type: IsarType.string,
+    ),
+    r'targetRole': PropertySchema(
+      id: 6,
       name: r'targetRole',
+      type: IsarType.string,
+    ),
+    r'title': PropertySchema(
+      id: 7,
+      name: r'title',
       type: IsarType.string,
     )
   },
@@ -103,7 +113,19 @@ int _attendanceModelEstimateSize(
       bytesCount += value.length * 3;
     }
   }
+  {
+    final value = object.seriesId;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   bytesCount += 3 + object.targetRole.length * 3;
+  {
+    final value = object.title;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -118,7 +140,9 @@ void _attendanceModelSerialize(
   writer.writeString(offsets[2], object.id);
   writer.writeStringList(offsets[3], object.invitedMemberIds);
   writer.writeStringList(offsets[4], object.presentMemberIds);
-  writer.writeString(offsets[5], object.targetRole);
+  writer.writeString(offsets[5], object.seriesId);
+  writer.writeString(offsets[6], object.targetRole);
+  writer.writeString(offsets[7], object.title);
 }
 
 AttendanceModel _attendanceModelDeserialize(
@@ -133,7 +157,9 @@ AttendanceModel _attendanceModelDeserialize(
   object.id = reader.readString(offsets[2]);
   object.invitedMemberIds = reader.readStringList(offsets[3]) ?? [];
   object.presentMemberIds = reader.readStringList(offsets[4]) ?? [];
-  object.targetRole = reader.readString(offsets[5]);
+  object.seriesId = reader.readStringOrNull(offsets[5]);
+  object.targetRole = reader.readString(offsets[6]);
+  object.title = reader.readStringOrNull(offsets[7]);
   return object;
 }
 
@@ -155,7 +181,11 @@ P _attendanceModelDeserializeProp<P>(
     case 4:
       return (reader.readStringList(offset) ?? []) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
       return (reader.readString(offset)) as P;
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1211,6 +1241,160 @@ extension AttendanceModelQueryFilter
   }
 
   QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'seriesId',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'seriesId',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'seriesId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'seriesId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'seriesId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'seriesId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      seriesIdIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'seriesId',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
       targetRoleEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -1345,6 +1529,160 @@ extension AttendanceModelQueryFilter
       ));
     });
   }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'title',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'title',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'title',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'title',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'title',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'title',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterFilterCondition>
+      titleIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'title',
+        value: '',
+      ));
+    });
+  }
 }
 
 extension AttendanceModelQueryObject
@@ -1395,6 +1733,20 @@ extension AttendanceModelQuerySortBy
   }
 
   QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      sortBySeriesId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'seriesId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      sortBySeriesIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'seriesId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
       sortByTargetRole() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetRole', Sort.asc);
@@ -1405,6 +1757,19 @@ extension AttendanceModelQuerySortBy
       sortByTargetRoleDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetRole', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy> sortByTitle() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'title', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      sortByTitleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'title', Sort.desc);
     });
   }
 }
@@ -1464,6 +1829,20 @@ extension AttendanceModelQuerySortThenBy
   }
 
   QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      thenBySeriesId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'seriesId', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      thenBySeriesIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'seriesId', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
       thenByTargetRole() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetRole', Sort.asc);
@@ -1474,6 +1853,19 @@ extension AttendanceModelQuerySortThenBy
       thenByTargetRoleDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetRole', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy> thenByTitle() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'title', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QAfterSortBy>
+      thenByTitleDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'title', Sort.desc);
     });
   }
 }
@@ -1514,10 +1906,24 @@ extension AttendanceModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AttendanceModel, AttendanceModel, QDistinct> distinctBySeriesId(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'seriesId', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<AttendanceModel, AttendanceModel, QDistinct>
       distinctByTargetRole({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'targetRole', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<AttendanceModel, AttendanceModel, QDistinct> distinctByTitle(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'title', caseSensitive: caseSensitive);
     });
   }
 }
@@ -1563,9 +1969,21 @@ extension AttendanceModelQueryProperty
     });
   }
 
+  QueryBuilder<AttendanceModel, String?, QQueryOperations> seriesIdProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'seriesId');
+    });
+  }
+
   QueryBuilder<AttendanceModel, String, QQueryOperations> targetRoleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'targetRole');
+    });
+  }
+
+  QueryBuilder<AttendanceModel, String?, QQueryOperations> titleProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'title');
     });
   }
 }

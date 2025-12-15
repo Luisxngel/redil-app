@@ -20,7 +20,9 @@ mixin _$AttendanceState {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -32,7 +34,9 @@ mixin _$AttendanceState {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -44,7 +48,8 @@ mixin _$AttendanceState {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -144,7 +149,9 @@ class _$InitialImpl implements _Initial {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -159,7 +166,9 @@ class _$InitialImpl implements _Initial {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -174,7 +183,8 @@ class _$InitialImpl implements _Initial {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -276,7 +286,9 @@ class _$LoadingImpl implements _Loading {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -291,7 +303,9 @@ class _$LoadingImpl implements _Loading {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -306,7 +320,8 @@ class _$LoadingImpl implements _Loading {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -374,7 +389,7 @@ abstract class _$$HistoryLoadedImplCopyWith<$Res> {
           _$HistoryLoadedImpl value, $Res Function(_$HistoryLoadedImpl) then) =
       __$$HistoryLoadedImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({List<Attendance> history});
+  $Res call({List<Attendance> history, List<AttendanceGroup> scheduled});
 }
 
 /// @nodoc
@@ -389,12 +404,17 @@ class __$$HistoryLoadedImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? history = null,
+    Object? scheduled = null,
   }) {
     return _then(_$HistoryLoadedImpl(
-      null == history
+      history: null == history
           ? _value._history
           : history // ignore: cast_nullable_to_non_nullable
               as List<Attendance>,
+      scheduled: null == scheduled
+          ? _value._scheduled
+          : scheduled // ignore: cast_nullable_to_non_nullable
+              as List<AttendanceGroup>,
     ));
   }
 }
@@ -402,8 +422,11 @@ class __$$HistoryLoadedImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$HistoryLoadedImpl implements HistoryLoaded {
-  const _$HistoryLoadedImpl(final List<Attendance> history)
-      : _history = history;
+  const _$HistoryLoadedImpl(
+      {required final List<Attendance> history,
+      required final List<AttendanceGroup> scheduled})
+      : _history = history,
+        _scheduled = scheduled;
 
   final List<Attendance> _history;
   @override
@@ -413,9 +436,17 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
     return EqualUnmodifiableListView(_history);
   }
 
+  final List<AttendanceGroup> _scheduled;
+  @override
+  List<AttendanceGroup> get scheduled {
+    if (_scheduled is EqualUnmodifiableListView) return _scheduled;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_scheduled);
+  }
+
   @override
   String toString() {
-    return 'AttendanceState.historyLoaded(history: $history)';
+    return 'AttendanceState.historyLoaded(history: $history, scheduled: $scheduled)';
   }
 
   @override
@@ -423,12 +454,16 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$HistoryLoadedImpl &&
-            const DeepCollectionEquality().equals(other._history, _history));
+            const DeepCollectionEquality().equals(other._history, _history) &&
+            const DeepCollectionEquality()
+                .equals(other._scheduled, _scheduled));
   }
 
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, const DeepCollectionEquality().hash(_history));
+  int get hashCode => Object.hash(
+      runtimeType,
+      const DeepCollectionEquality().hash(_history),
+      const DeepCollectionEquality().hash(_scheduled));
 
   @JsonKey(ignore: true)
   @override
@@ -441,14 +476,16 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
     required TResult Function(String message) actionSuccess,
     required TResult Function(String message) error,
   }) {
-    return historyLoaded(history);
+    return historyLoaded(history, scheduled);
   }
 
   @override
@@ -456,14 +493,16 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
     TResult? Function(String message)? actionSuccess,
     TResult? Function(String message)? error,
   }) {
-    return historyLoaded?.call(history);
+    return historyLoaded?.call(history, scheduled);
   }
 
   @override
@@ -471,7 +510,8 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -480,7 +520,7 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
     required TResult orElse(),
   }) {
     if (historyLoaded != null) {
-      return historyLoaded(history);
+      return historyLoaded(history, scheduled);
     }
     return orElse();
   }
@@ -530,10 +570,12 @@ class _$HistoryLoadedImpl implements HistoryLoaded {
 }
 
 abstract class HistoryLoaded implements AttendanceState {
-  const factory HistoryLoaded(final List<Attendance> history) =
-      _$HistoryLoadedImpl;
+  const factory HistoryLoaded(
+      {required final List<Attendance> history,
+      required final List<AttendanceGroup> scheduled}) = _$HistoryLoadedImpl;
 
   List<Attendance> get history;
+  List<AttendanceGroup> get scheduled;
   @JsonKey(ignore: true)
   _$$HistoryLoadedImplCopyWith<_$HistoryLoadedImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -650,7 +692,9 @@ class _$FormLoadedImpl implements FormLoaded {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -665,7 +709,9 @@ class _$FormLoadedImpl implements FormLoaded {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -680,7 +726,8 @@ class _$FormLoadedImpl implements FormLoaded {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -818,7 +865,9 @@ class _$ActionSuccessImpl implements ActionSuccess {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -833,7 +882,9 @@ class _$ActionSuccessImpl implements ActionSuccess {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -848,7 +899,8 @@ class _$ActionSuccessImpl implements ActionSuccess {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -981,7 +1033,9 @@ class _$ErrorImpl implements Error {
   TResult when<TResult extends Object?>({
     required TResult Function() initial,
     required TResult Function() loading,
-    required TResult Function(List<Attendance> history) historyLoaded,
+    required TResult Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)
+        historyLoaded,
     required TResult Function(Attendance? existingEvent,
             List<Member> allMembers, Set<String> selectedMemberIds)
         formLoaded,
@@ -996,7 +1050,9 @@ class _$ErrorImpl implements Error {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? initial,
     TResult? Function()? loading,
-    TResult? Function(List<Attendance> history)? historyLoaded,
+    TResult? Function(
+            List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult? Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,
@@ -1011,7 +1067,8 @@ class _$ErrorImpl implements Error {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? initial,
     TResult Function()? loading,
-    TResult Function(List<Attendance> history)? historyLoaded,
+    TResult Function(List<Attendance> history, List<AttendanceGroup> scheduled)?
+        historyLoaded,
     TResult Function(Attendance? existingEvent, List<Member> allMembers,
             Set<String> selectedMemberIds)?
         formLoaded,

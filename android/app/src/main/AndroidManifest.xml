@@ -9,6 +9,12 @@
             <data android:scheme="sms" />
         </intent>
     </queries>
+    <queries>
+        <package android:name="com.sirma.mobile.bible.android" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="youversion" />
+        </intent>
 
     <application
         android:label="redil"

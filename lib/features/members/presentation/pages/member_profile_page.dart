@@ -92,10 +92,11 @@ class MemberProfilePage extends StatelessWidget {
         // Default to grey if loading
         Color ringColor = Colors.grey;
         int extraCount = 0; 
+        double percentage = 0.0;
 
         if (snapshot.hasData) {
           final stats = snapshot.data!;
-          final percentage = stats['percentage'] as double;
+          percentage = stats['percentage'] as double;
           final status = stats['status'] as String? ?? 'ACTIVE';
           extraCount = stats['extraCount'] as int? ?? 0;
 
@@ -145,7 +146,29 @@ class MemberProfilePage extends StatelessWidget {
               member.role.label.toUpperCase(),
               style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500),
             ),
-             if (extraCount > 0) ...[
+             if (percentage >= 100) ...[
+                const SizedBox(height: 8),
+                Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                   decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.amber.shade200),
+                   ),
+                   child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                         Icon(Icons.local_fire_department_rounded, size: 16, color: Colors.amber.shade800),
+                         const SizedBox(width: 4),
+                         Text('Persistencia Perfecta', style: TextStyle(
+                            fontSize: 12, 
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber.shade900
+                         )),
+                      ],
+                   ),
+                ),
+             ] else if (extraCount > 0) ...[
                 const SizedBox(height: 8),
                 Container(
                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -265,17 +288,47 @@ class MemberProfilePage extends StatelessWidget {
            return const Center(child: Text('No hay historial de asistencia.'));
          }
 
+         final now = DateTime.now();
+         final futureEvents = history.where((e) => (e['date'] as DateTime).isAfter(now)).toList();
+         final pastEvents = history.where((e) => (e['date'] as DateTime).isBefore(now) || (e['date'] as DateTime).isAtSameMomentAs(now)).toList();
+         
+         futureEvents.sort((a, b) => (a['date'] as DateTime).compareTo(b['date'] as DateTime));
+         pastEvents.sort((a, b) => (b['date'] as DateTime).compareTo(a['date'] as DateTime));
+
          return Column(
            crossAxisAlignment: CrossAxisAlignment.start,
            children: [
-             const Text('Historial Reciente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+             if (futureEvents.isNotEmpty) ...[
+                Text('Próximos Eventos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+                const SizedBox(height: 12),
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: futureEvents.length,
+                  itemBuilder: (context, index) {
+                    final item = futureEvents[index];
+                    final date = item['date'] as DateTime;
+                    return ListTile(
+                      leading: const Icon(Icons.access_time_rounded, color: Colors.grey),
+                      title: Text(DateFormat('EEEE d MMM, y', 'es').format(date)),
+                      subtitle: Text(item['description'] ?? 'Evento'),
+                      trailing: const Text('Pendiente', style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey)),
+                    );
+                  },
+                ),
+                const SizedBox(height: 24),
+             ],
+
+             const Text('Historial Reciente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
              const SizedBox(height: 12),
+             if (pastEvents.isEmpty)
+               const Text('No hay historial pasado.'),
              ListView.builder(
                shrinkWrap: true,
                physics: const NeverScrollableScrollPhysics(),
-               itemCount: history.length,
+               itemCount: pastEvents.length,
                itemBuilder: (context, index) {
-                 final item = history[index];
+                 final item = pastEvents[index];
                  final date = item['date'] as DateTime;
                  final attended = item['attended'] as bool;
                  return ListTile(

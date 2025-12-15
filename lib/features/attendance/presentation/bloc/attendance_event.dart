@@ -9,9 +9,13 @@ class AttendanceEvent with _$AttendanceEvent {
   const factory AttendanceEvent.toggleMember(String memberId) = ToggleMember;
   const factory AttendanceEvent.saveEvent({
     required DateTime date,
+    String? title, // New
     String? description,
     @Default('ALL') String targetRole,
     @Default([]) List<String> invitedMemberIds,
+    @Default(false) bool isRecurring,
+    @Default('WEEKLY') String recurrenceFrequency,
+    DateTime? recurrenceEndDate,
   }) = SaveEvent;
   const factory AttendanceEvent.deleteEvent(String id) = DeleteEvent;
 }

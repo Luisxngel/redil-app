@@ -52,40 +52,45 @@ const MemberModelSchema = CollectionSchema(
       name: r'isDeleted',
       type: IsarType.bool,
     ),
-    r'lastAttendanceDate': PropertySchema(
+    r'isHarvested': PropertySchema(
       id: 7,
+      name: r'isHarvested',
+      type: IsarType.bool,
+    ),
+    r'lastAttendanceDate': PropertySchema(
+      id: 8,
       name: r'lastAttendanceDate',
       type: IsarType.dateTime,
     ),
     r'lastName': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'lastName',
       type: IsarType.string,
     ),
     r'notes': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'notes',
       type: IsarType.string,
     ),
     r'phone': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'phone',
       type: IsarType.string,
     ),
     r'role': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'role',
       type: IsarType.byte,
       enumMap: _MemberModelroleEnumValueMap,
     ),
     r'status': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MemberModelstatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -169,13 +174,14 @@ void _memberModelSerialize(
   writer.writeString(offsets[4], object.firstName);
   writer.writeString(offsets[5], object.id);
   writer.writeBool(offsets[6], object.isDeleted);
-  writer.writeDateTime(offsets[7], object.lastAttendanceDate);
-  writer.writeString(offsets[8], object.lastName);
-  writer.writeString(offsets[9], object.notes);
-  writer.writeString(offsets[10], object.phone);
-  writer.writeByte(offsets[11], object.role.index);
-  writer.writeByte(offsets[12], object.status.index);
-  writer.writeDateTime(offsets[13], object.updatedAt);
+  writer.writeBool(offsets[7], object.isHarvested);
+  writer.writeDateTime(offsets[8], object.lastAttendanceDate);
+  writer.writeString(offsets[9], object.lastName);
+  writer.writeString(offsets[10], object.notes);
+  writer.writeString(offsets[11], object.phone);
+  writer.writeByte(offsets[12], object.role.index);
+  writer.writeByte(offsets[13], object.status.index);
+  writer.writeDateTime(offsets[14], object.updatedAt);
 }
 
 MemberModel _memberModelDeserialize(
@@ -192,17 +198,18 @@ MemberModel _memberModelDeserialize(
     firstName: reader.readString(offsets[4]),
     id: reader.readString(offsets[5]),
     isDeleted: reader.readBoolOrNull(offsets[6]) ?? false,
+    isHarvested: reader.readBoolOrNull(offsets[7]) ?? false,
     isarId: id,
-    lastAttendanceDate: reader.readDateTimeOrNull(offsets[7]),
-    lastName: reader.readString(offsets[8]),
-    notes: reader.readStringOrNull(offsets[9]),
-    phone: reader.readString(offsets[10]),
-    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[11])] ??
+    lastAttendanceDate: reader.readDateTimeOrNull(offsets[8]),
+    lastName: reader.readString(offsets[9]),
+    notes: reader.readStringOrNull(offsets[10]),
+    phone: reader.readString(offsets[11]),
+    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[12])] ??
         MemberRole.leader,
     status:
-        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[12])] ??
+        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[13])] ??
             MemberStatus.active,
-    updatedAt: reader.readDateTimeOrNull(offsets[13]),
+    updatedAt: reader.readDateTimeOrNull(offsets[14]),
   );
   return object;
 }
@@ -229,20 +236,22 @@ P _memberModelDeserializeProp<P>(
     case 6:
       return (reader.readBoolOrNull(offset) ?? false) as P;
     case 7:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBoolOrNull(offset) ?? false) as P;
     case 8:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 9:
-      return (reader.readStringOrNull(offset)) as P;
-    case 10:
       return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readStringOrNull(offset)) as P;
     case 11:
+      return (reader.readString(offset)) as P;
+    case 12:
       return (_MemberModelroleValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberRole.leader) as P;
-    case 12:
+    case 13:
       return (_MemberModelstatusValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberStatus.active) as P;
-    case 13:
+    case 14:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1197,6 +1206,16 @@ extension MemberModelQueryFilter
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      isHarvestedEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isHarvested',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> isarIdEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -2017,6 +2036,18 @@ extension MemberModelQuerySortBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByIsHarvested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHarvested', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByIsHarvestedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHarvested', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy>
       sortByLastAttendanceDate() {
     return QueryBuilder.apply(this, (query) {
@@ -2192,6 +2223,18 @@ extension MemberModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByIsHarvested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHarvested', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByIsHarvestedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isHarvested', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByIsarId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isarId', Sort.asc);
@@ -2339,6 +2382,12 @@ extension MemberModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByIsHarvested() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isHarvested');
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QDistinct>
       distinctByLastAttendanceDate() {
     return QueryBuilder.apply(this, (query) {
@@ -2433,6 +2482,12 @@ extension MemberModelQueryProperty
   QueryBuilder<MemberModel, bool, QQueryOperations> isDeletedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isDeleted');
+    });
+  }
+
+  QueryBuilder<MemberModel, bool, QQueryOperations> isHarvestedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isHarvested');
     });
   }
 

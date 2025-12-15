@@ -11,6 +11,10 @@ class DashboardState with _$DashboardState {
   const factory DashboardState.loaded({
     required int activeCount,
     required double attendanceAverage,
+    required int lastEventAttendance, // Derived or kept for ease
+    required List<Member> lastAttendees, // NEW
+    required int harvestCount, // Derived or kept
+    required List<Member> harvestMembers, // NEW
     required List<Member> birthdayMembers,
     required List<MemberRisk> riskMembers,
   }) = DashboardLoaded;

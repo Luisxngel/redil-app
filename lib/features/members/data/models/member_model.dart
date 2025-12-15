@@ -33,6 +33,8 @@ class MemberModel {
   final String? notes;
   
   bool isDeleted;
+  bool isHarvested;
+  DateTime? lastContacted; // NEW
 
   MemberModel({
     this.isarId = Isar.autoIncrement,
@@ -50,6 +52,8 @@ class MemberModel {
     this.civilStatusIndex,
     this.notes,
     this.isDeleted = false,
+    this.isHarvested = false,
+    this.lastContacted,
   });
 
   /// Mapper: Entity -> Model
@@ -70,6 +74,8 @@ class MemberModel {
       civilStatusIndex: member.civilStatus?.index,
       notes: member.notes,
       isDeleted: member.isDeleted,
+      isHarvested: member.isHarvested,
+      lastContacted: member.lastContacted,
     );
   }
 
@@ -92,6 +98,8 @@ class MemberModel {
           : null,
       notes: notes,
       isDeleted: isDeleted,
+      isHarvested: isHarvested,
+      lastContacted: lastContacted,
     );
   }
 }

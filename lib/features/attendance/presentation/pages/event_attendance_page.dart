@@ -76,7 +76,7 @@ class _EventAttendanceView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          existingEvent.description ?? 'Evento Sin Nombre',
+                          existingEvent.title ?? existingEvent.description ?? 'Evento Sin Nombre',
                           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 4),
@@ -170,7 +170,7 @@ class _EventAttendanceView extends StatelessWidget {
                         onPressed: () {
                            context.read<AttendanceBloc>().add(AttendanceEvent.saveEvent(
                              date: existingEvent.date,
-                             description: existingEvent.description,
+                             description: existingEvent.title ?? existingEvent.description,
                            ));
                         },
                       ),

@@ -4,13 +4,15 @@ import '../../features/attendance/domain/entities/attendance.dart';
 import '../../features/members/domain/entities/member.dart';
 import '../../features/members/domain/entities/member_risk.dart'; // NEW
 import '../../features/members/domain/repositories/member_repository.dart';
+import '../providers/date_time_provider.dart';
 
 @lazySingleton
 class StatisticsService {
   final MemberRepository _memberRepo;
   final AttendanceRepository _attendanceRepo;
+  final IDateTimeProvider _timeProvider;
 
-  StatisticsService(this._memberRepo, this._attendanceRepo);
+  StatisticsService(this._memberRepo, this._attendanceRepo, this._timeProvider);
 
   /// 1. Active Members Count
   Future<int> getActiveMembersCount() async {
@@ -21,7 +23,7 @@ class StatisticsService {
   /// 2. Upcoming Birthdays (next [days] days)
   Future<List<Member>> getUpcomingBirthdays({int days = 7}) async {
     final members = await _memberRepo.getMembers().first;
-    final now = DateTime.now();
+    final now = _timeProvider.now;
     final limit = now.add(Duration(days: days));
 
     return members.where((m) {
@@ -68,7 +70,7 @@ class StatisticsService {
       int consecutiveAbsences = 0;
 
       for (var event in history) {
-        if (event.date.isAfter(DateTime.now())) continue; // FIX
+        if (event.date.isAfter(_timeProvider.now)) continue; // FIX
         final isMandatory = _isMandatoryFor(member, event);
         if (isMandatory) {
           final attended = event.presentMemberIds.contains(member.id);
@@ -81,11 +83,25 @@ class StatisticsService {
         }
       }
 
-      // If consecutive absences meet threshold, add to risk list
+      // If consecutive absences meet threshold AND not contacted recently
       if (consecutiveAbsences >= threshold) {
-        riskList.add(MemberRisk(member, consecutiveAbsences));
+        // Logic: Show if never contacted OR contacted > 7 days ago
+        bool showInRisk = true;
+        if (member.lastContacted != null) {
+           final daysSinceContact = _timeProvider.now.difference(member.lastContacted!).inDays;
+           if (daysSinceContact <= 7) {
+             showInRisk = false; // Give them a break
+           }
+        }
+
+        if (showInRisk) {
+          riskList.add(MemberRisk(member, consecutiveAbsences));
+        }
       }
     }
+    
+    // Sort by risk (higher absences first)
+    riskList.sort((a, b) => b.consecutiveAbsences.compareTo(a.consecutiveAbsences));
     
     return riskList;
   }
@@ -105,6 +121,58 @@ class StatisticsService {
 
      final total = recentEvents.fold(0, (sum, event) => sum + event.presentMemberIds.length);
      return total / recentEvents.length;
+  }
+
+  /// 5. Last Event Attendance Count
+  Future<int> getLastEventAttendanceCount() async {
+    final history = await _attendanceRepo.getHistory().first;
+    // Filter out future events to be safe
+    final pastEvents = history.where((e) => e.date.isBefore(_timeProvider.now) || e.date.isAtSameMomentAs(_timeProvider.now)).toList();
+    
+    if (pastEvents.isEmpty) return 0;
+    
+    // Assuming history is sorted DESC. If not, sort it.
+    // Usually repo returns sorted, but let's be safe or just take first if trustworthy.
+    // The previous logic takes first. Let's assume list is recent-first.
+    return pastEvents.first.presentMemberIds.length;
+  }
+
+  /// 5b. Last Event Attendees
+  Future<List<Member>> getLastEventAttendees() async {
+    final history = await _attendanceRepo.getHistory().first;
+    // Filter out future events
+    final pastEvents = history.where((e) => e.date.isBefore(_timeProvider.now) || e.date.isAtSameMomentAs(_timeProvider.now)).toList();
+    
+    if (pastEvents.isEmpty) return [];
+    
+    final lastEvent = pastEvents.first;
+    final allMembers = await _memberRepo.getMembers().first;
+    
+    return allMembers.where((m) => lastEvent.presentMemberIds.contains(m.id)).toList();
+  }
+
+  /// 6. Harvest Count (Members created this month)
+  Future<int> getHarvestCount() async {
+    final members = await _memberRepo.getMembers().first;
+    final now = _timeProvider.now;
+    
+    return members.where((m) {
+      if (m.isDeleted) return false;
+      if (m.isHarvested) return false; // NEW: Exclude harvested
+      return m.createdAt.year == now.year && m.createdAt.month == now.month;
+    }).length;
+  }
+
+  /// 6b. Harvest Members (Members created this month)
+  Future<List<Member>> getHarvestMembers() async {
+    final members = await _memberRepo.getMembers().first;
+    final now = _timeProvider.now;
+    
+    return members.where((m) {
+      if (m.isDeleted) return false;
+      if (m.isHarvested) return false; // NEW: Exclude harvested
+      return m.createdAt.year == now.year && m.createdAt.month == now.month;
+    }).toList();
   }
 
   /// 5. Member History
@@ -144,10 +212,10 @@ class StatisticsService {
       final attended = event.presentMemberIds.contains(memberId);
       return {
         'date': event.date,
-        'description': event.description ?? 'Reunión General',
-        'attended': attended,
+        'description': event.title ?? event.description ?? 'Reunión General',
+        'attended': event.presentMemberIds.contains(memberId),
         'isOptional': event.targetRole == 'OPTIONAL',
-        'isFuture': event.date.isAfter(DateTime.now()),
+        'isFuture': event.date.isAfter(_timeProvider.now),
       };
     }).toList();
   }
@@ -174,7 +242,7 @@ class StatisticsService {
 
     for (var event in history) {
       // FIX: Ignore future events for statistics
-      if (event.date.isAfter(DateTime.now())) continue;
+      if (event.date.isAfter(_timeProvider.now)) continue;
 
       print('LOOP Processing: ${event.description} for ${member?.firstName}'); // DEBUG
       final attended = event.presentMemberIds.contains(memberId);
@@ -228,9 +296,9 @@ class StatisticsService {
     }).take(5).map((event) {
       return {
         'date': event.date,
-        'description': event.description ?? 'Reunión General',
+        'description': event.title ?? event.description ?? 'Reunión General',
         'attended': event.presentMemberIds.contains(memberId),
-        'isFuture': event.date.isAfter(DateTime.now()),
+        'isFuture': event.date.isAfter(_timeProvider.now),
       };
     }).toList();
 

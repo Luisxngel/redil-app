@@ -11,6 +11,7 @@ class AttendanceModel {
   late String id;
 
   late DateTime date;
+  String? title; // NEW
   String? description;
   
   // CORRECCIÓN: Inicialización explícita y no-late para evitar nulos
@@ -18,30 +19,36 @@ class AttendanceModel {
   
   late String targetRole = 'ALL';
   
-  // CORRECCIÓN: Inicialización explícita, se asegura persistencia
+  // CRÍTICO: Inicialización explícita, se asegura persistencia
   List<String> invitedMemberIds = [];
+
+  String? seriesId;
 
   static AttendanceModel fromEntity(Attendance attendance) {
     return AttendanceModel()
       ..id = attendance.id
       ..date = attendance.date
+      ..title = attendance.title
       ..description = attendance.description
       // CRÍTICO: .from para romper referencia y asegurar tipo
       ..presentMemberIds = List<String>.from(attendance.presentMemberIds)
       ..targetRole = attendance.targetRole
       // CRÍTICO: Copia defensiva. Si llega null (no debería), usa []
-      ..invitedMemberIds = List<String>.from(attendance.invitedMemberIds);
+      ..invitedMemberIds = List<String>.from(attendance.invitedMemberIds)
+      ..seriesId = attendance.seriesId;
   }
 
   Attendance toEntity() {
     return Attendance(
       id: id,
       date: date,
+      title: title,
       description: description,
       // CRÍTICO: Lectura segura
       presentMemberIds: List<String>.from(presentMemberIds),
       targetRole: targetRole,
       invitedMemberIds: List<String>.from(invitedMemberIds),
+      seriesId: seriesId,
     );
   }
 }

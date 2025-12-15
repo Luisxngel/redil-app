@@ -21,8 +21,15 @@ mixin _$AttendanceEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) =>
@@ -32,8 +39,15 @@ mixin _$AttendanceEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) =>
@@ -43,8 +57,15 @@ mixin _$AttendanceEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
@@ -139,8 +160,15 @@ class _$LoadHistoryImpl implements LoadHistory {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
@@ -153,8 +181,15 @@ class _$LoadHistoryImpl implements LoadHistory {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
@@ -167,8 +202,15 @@ class _$LoadHistoryImpl implements LoadHistory {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
@@ -292,8 +334,15 @@ class _$LoadFormImpl implements LoadForm {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
@@ -306,8 +355,15 @@ class _$LoadFormImpl implements LoadForm {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
@@ -320,8 +376,15 @@ class _$LoadFormImpl implements LoadForm {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
@@ -450,8 +513,15 @@ class _$ToggleMemberImpl implements ToggleMember {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
@@ -464,8 +534,15 @@ class _$ToggleMemberImpl implements ToggleMember {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
@@ -478,8 +555,15 @@ class _$ToggleMemberImpl implements ToggleMember {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
@@ -548,9 +632,13 @@ abstract class _$$SaveEventImplCopyWith<$Res> {
   @useResult
   $Res call(
       {DateTime date,
+      String? title,
       String? description,
       String targetRole,
-      List<String> invitedMemberIds});
+      List<String> invitedMemberIds,
+      bool isRecurring,
+      String recurrenceFrequency,
+      DateTime? recurrenceEndDate});
 }
 
 /// @nodoc
@@ -565,15 +653,23 @@ class __$$SaveEventImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? date = null,
+    Object? title = freezed,
     Object? description = freezed,
     Object? targetRole = null,
     Object? invitedMemberIds = null,
+    Object? isRecurring = null,
+    Object? recurrenceFrequency = null,
+    Object? recurrenceEndDate = freezed,
   }) {
     return _then(_$SaveEventImpl(
       date: null == date
           ? _value.date
           : date // ignore: cast_nullable_to_non_nullable
               as DateTime,
+      title: freezed == title
+          ? _value.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String?,
       description: freezed == description
           ? _value.description
           : description // ignore: cast_nullable_to_non_nullable
@@ -586,6 +682,18 @@ class __$$SaveEventImplCopyWithImpl<$Res>
           ? _value._invitedMemberIds
           : invitedMemberIds // ignore: cast_nullable_to_non_nullable
               as List<String>,
+      isRecurring: null == isRecurring
+          ? _value.isRecurring
+          : isRecurring // ignore: cast_nullable_to_non_nullable
+              as bool,
+      recurrenceFrequency: null == recurrenceFrequency
+          ? _value.recurrenceFrequency
+          : recurrenceFrequency // ignore: cast_nullable_to_non_nullable
+              as String,
+      recurrenceEndDate: freezed == recurrenceEndDate
+          ? _value.recurrenceEndDate
+          : recurrenceEndDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -595,13 +703,20 @@ class __$$SaveEventImplCopyWithImpl<$Res>
 class _$SaveEventImpl implements SaveEvent {
   const _$SaveEventImpl(
       {required this.date,
+      this.title,
       this.description,
       this.targetRole = 'ALL',
-      final List<String> invitedMemberIds = const []})
+      final List<String> invitedMemberIds = const [],
+      this.isRecurring = false,
+      this.recurrenceFrequency = 'WEEKLY',
+      this.recurrenceEndDate})
       : _invitedMemberIds = invitedMemberIds;
 
   @override
   final DateTime date;
+  @override
+  final String? title;
+// New
   @override
   final String? description;
   @override
@@ -618,8 +733,17 @@ class _$SaveEventImpl implements SaveEvent {
   }
 
   @override
+  @JsonKey()
+  final bool isRecurring;
+  @override
+  @JsonKey()
+  final String recurrenceFrequency;
+  @override
+  final DateTime? recurrenceEndDate;
+
+  @override
   String toString() {
-    return 'AttendanceEvent.saveEvent(date: $date, description: $description, targetRole: $targetRole, invitedMemberIds: $invitedMemberIds)';
+    return 'AttendanceEvent.saveEvent(date: $date, title: $title, description: $description, targetRole: $targetRole, invitedMemberIds: $invitedMemberIds, isRecurring: $isRecurring, recurrenceFrequency: $recurrenceFrequency, recurrenceEndDate: $recurrenceEndDate)';
   }
 
   @override
@@ -628,17 +752,32 @@ class _$SaveEventImpl implements SaveEvent {
         (other.runtimeType == runtimeType &&
             other is _$SaveEventImpl &&
             (identical(other.date, date) || other.date == date) &&
+            (identical(other.title, title) || other.title == title) &&
             (identical(other.description, description) ||
                 other.description == description) &&
             (identical(other.targetRole, targetRole) ||
                 other.targetRole == targetRole) &&
             const DeepCollectionEquality()
-                .equals(other._invitedMemberIds, _invitedMemberIds));
+                .equals(other._invitedMemberIds, _invitedMemberIds) &&
+            (identical(other.isRecurring, isRecurring) ||
+                other.isRecurring == isRecurring) &&
+            (identical(other.recurrenceFrequency, recurrenceFrequency) ||
+                other.recurrenceFrequency == recurrenceFrequency) &&
+            (identical(other.recurrenceEndDate, recurrenceEndDate) ||
+                other.recurrenceEndDate == recurrenceEndDate));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, date, description, targetRole,
-      const DeepCollectionEquality().hash(_invitedMemberIds));
+  int get hashCode => Object.hash(
+      runtimeType,
+      date,
+      title,
+      description,
+      targetRole,
+      const DeepCollectionEquality().hash(_invitedMemberIds),
+      isRecurring,
+      recurrenceFrequency,
+      recurrenceEndDate);
 
   @JsonKey(ignore: true)
   @override
@@ -652,12 +791,20 @@ class _$SaveEventImpl implements SaveEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
-    return saveEvent(date, description, targetRole, invitedMemberIds);
+    return saveEvent(date, title, description, targetRole, invitedMemberIds,
+        isRecurring, recurrenceFrequency, recurrenceEndDate);
   }
 
   @override
@@ -666,12 +813,20 @@ class _$SaveEventImpl implements SaveEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
-    return saveEvent?.call(date, description, targetRole, invitedMemberIds);
+    return saveEvent?.call(date, title, description, targetRole,
+        invitedMemberIds, isRecurring, recurrenceFrequency, recurrenceEndDate);
   }
 
   @override
@@ -680,14 +835,22 @@ class _$SaveEventImpl implements SaveEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),
   }) {
     if (saveEvent != null) {
-      return saveEvent(date, description, targetRole, invitedMemberIds);
+      return saveEvent(date, title, description, targetRole, invitedMemberIds,
+          isRecurring, recurrenceFrequency, recurrenceEndDate);
     }
     return orElse();
   }
@@ -736,14 +899,22 @@ class _$SaveEventImpl implements SaveEvent {
 abstract class SaveEvent implements AttendanceEvent {
   const factory SaveEvent(
       {required final DateTime date,
+      final String? title,
       final String? description,
       final String targetRole,
-      final List<String> invitedMemberIds}) = _$SaveEventImpl;
+      final List<String> invitedMemberIds,
+      final bool isRecurring,
+      final String recurrenceFrequency,
+      final DateTime? recurrenceEndDate}) = _$SaveEventImpl;
 
   DateTime get date;
+  String? get title; // New
   String? get description;
   String get targetRole;
   List<String> get invitedMemberIds;
+  bool get isRecurring;
+  String get recurrenceFrequency;
+  DateTime? get recurrenceEndDate;
   @JsonKey(ignore: true)
   _$$SaveEventImplCopyWith<_$SaveEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
@@ -816,8 +987,15 @@ class _$DeleteEventImpl implements DeleteEvent {
     required TResult Function() loadHistory,
     required TResult Function(String? attendanceId) loadForm,
     required TResult Function(String memberId) toggleMember,
-    required TResult Function(DateTime date, String? description,
-            String targetRole, List<String> invitedMemberIds)
+    required TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)
         saveEvent,
     required TResult Function(String id) deleteEvent,
   }) {
@@ -830,8 +1008,15 @@ class _$DeleteEventImpl implements DeleteEvent {
     TResult? Function()? loadHistory,
     TResult? Function(String? attendanceId)? loadForm,
     TResult? Function(String memberId)? toggleMember,
-    TResult? Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult? Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult? Function(String id)? deleteEvent,
   }) {
@@ -844,8 +1029,15 @@ class _$DeleteEventImpl implements DeleteEvent {
     TResult Function()? loadHistory,
     TResult Function(String? attendanceId)? loadForm,
     TResult Function(String memberId)? toggleMember,
-    TResult Function(DateTime date, String? description, String targetRole,
-            List<String> invitedMemberIds)?
+    TResult Function(
+            DateTime date,
+            String? title,
+            String? description,
+            String targetRole,
+            List<String> invitedMemberIds,
+            bool isRecurring,
+            String recurrenceFrequency,
+            DateTime? recurrenceEndDate)?
         saveEvent,
     TResult Function(String id)? deleteEvent,
     required TResult orElse(),

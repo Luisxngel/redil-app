@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart'; // NEW
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
@@ -27,4 +28,10 @@ abstract class IsarModule {
       directory: dir.path,
     );
   }
+}
+
+@module
+abstract class RegisterModule {
+  @preResolve
+  Future<SharedPreferences> get prefs => SharedPreferences.getInstance();
 }

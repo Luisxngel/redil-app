@@ -25,6 +25,8 @@ class Member extends Equatable {
   final bool isDeleted;
   final bool isHarvested; 
   final DateTime? lastContacted; // NEW: Track last interaction
+  final String? photoPath; // NEW
+  final String? profession; // NEW
 
   const Member({
     this.id,
@@ -43,6 +45,8 @@ class Member extends Equatable {
     this.isDeleted = false,
     this.isHarvested = false,
     this.lastContacted,
+    this.photoPath,
+    this.profession,
   });
 
   @override
@@ -63,6 +67,8 @@ class Member extends Equatable {
         isDeleted,
         isHarvested,
         lastContacted,
+        photoPath,
+        profession,
       ];
 
   // Business Logic / Validation could go here or in UseCases/ValueObjects
@@ -91,6 +97,8 @@ class Member extends Equatable {
     bool? isDeleted,
     bool? isHarvested,
     DateTime? lastContacted,
+    String? photoPath,
+    String? profession,
   }) {
     return Member(
       id: id ?? this.id,
@@ -109,6 +117,8 @@ class Member extends Equatable {
       isDeleted: isDeleted ?? this.isDeleted,
       isHarvested: isHarvested ?? this.isHarvested,
       lastContacted: lastContacted ?? this.lastContacted,
+      photoPath: photoPath ?? this.photoPath,
+      profession: profession ?? this.profession,
     );
   }
 }

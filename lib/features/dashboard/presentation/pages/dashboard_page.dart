@@ -10,10 +10,14 @@ import '../../../../core/theme/theme_cubit.dart';
 import '../bloc/dashboard_bloc.dart';
 import '../bloc/dashboard_event.dart';
 import '../bloc/dashboard_state.dart';
-import '../../../members/domain/entities/member.dart'; 
-import '../../../members/domain/entities/member_risk.dart'; 
-import '../../../../core/services/statistics_service.dart'; // NEW
-import '../../../members/domain/repositories/member_repository.dart'; // NEW for Actions
+import 'package:redil/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:redil/features/settings/presentation/bloc/settings_event.dart';
+import 'package:redil/features/settings/presentation/bloc/settings_state.dart';
+import 'package:redil/features/settings/presentation/widgets/identity_dialog.dart';
+import 'package:redil/features/members/domain/entities/member.dart'; 
+import 'package:redil/features/members/domain/entities/member_risk.dart'; 
+import 'package:redil/core/services/statistics_service.dart'; 
+import 'package:redil/features/members/domain/repositories/member_repository.dart'; 
 import '../../../../core/utils/enum_extensions.dart';
 import '../widgets/dashboard_calendar.dart';
 
@@ -47,8 +51,6 @@ class _DashboardViewState extends State<_DashboardView> {
       showDragHandle: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (modalContext) {
-        // Use StatefulBuilder if we want the switch to animate immediately inside the modal 
-        // while also updating the parent state.
         return StatefulBuilder(
           builder: (context, setStateModal) {
             return Column(
@@ -67,13 +69,21 @@ class _DashboardViewState extends State<_DashboardView> {
                   },
                 ),
                 ListTile(
+                  title: const Text('Identidad Redil'),
+                  subtitle: const Text('Nombres y Títulos'),
+                  leading: const Icon(Icons.badge_outlined),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.pop(context);
+                    showDialog(context: context, builder: (_) => const IdentityDialog());
+                  },
+                ),
+                ListTile(
                   title: const Text('Tema de la Aplicación'),
                   subtitle: const Text('Cambiar el color global del Redil'),
                   leading: const Icon(Icons.format_paint_outlined),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    // Close modal first? User instruction says "Trigger logic".
-                    // Generally better to close sheet then open dialog to avoid stacking issues.
                     Navigator.pop(context); 
                     _showThemeDialog(context);
                   },
@@ -134,10 +144,6 @@ class _DashboardViewState extends State<_DashboardView> {
               itemBuilder: (context, index) {
                 final risk = currentList[index];
                 final member = risk.member;
-                
-                // Calculate Days Absent (Approximate logic based on absences for now, 
-                // ideally show last attendance date interval)
-                // Let's just say "X ausencias consecutivas" is the key metric.
                 
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 0),
@@ -256,11 +262,7 @@ class _DashboardViewState extends State<_DashboardView> {
         return StatefulBuilder(
           builder: (context, setStateModal) {
             final currentList = harvestMembers; 
-            // Note: Since we are not re-fetching from repository in real-time, 
-            // we manage the list visually via local state changes or just closing the modal.
-            // But since 'currentList' comes from the parent Bloc state, we can't easily modify it locally without a new fetch.
-            // Better UX: Perform action, show success, then trigger main refresh.
-            
+           
             return _buildListModal(
               context: context,
               title: 'Nuevos en la Familia',
@@ -303,13 +305,7 @@ class _DashboardViewState extends State<_DashboardView> {
                       result.fold(
                         (l) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: ${l.message}'))), 
                         (r) {
-                           // Remove from local list visually? 
-                           // Simplest: Refresh parent dashboard which rebuilds this list (but might not rebuild internal modal state without work).
-                           // Best MPV: Close modal or just trigger refresh and let user see it disappear if they reopen.
-                           // Actually, let's trigger reload.
                            context.read<DashboardBloc>().add(const DashboardEvent.loadDashboardData());
-                           
-                           // Remove visually from this modal instance if possible?
                            setStateModal(() {
                              currentList.removeAt(index);
                            });
@@ -333,7 +329,7 @@ class _DashboardViewState extends State<_DashboardView> {
     required String emptyMessage,
     required Widget Function(BuildContext, int) itemBuilder,
     required int itemCount,
-    Widget? headerAction, // NEW
+    Widget? headerAction,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -368,7 +364,7 @@ class _DashboardViewState extends State<_DashboardView> {
   void _showMemberDetail(BuildContext context, Member member) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true, // Allow full height if needed
+      isScrollControlled: true, 
       showDragHandle: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (context) => DraggableScrollableSheet(
@@ -423,144 +419,148 @@ class _DashboardViewState extends State<_DashboardView> {
     final Color colorHarvest = _isMulticolor ? Colors.green : theme.colorScheme.primary;
     final Color colorMembers = _isMulticolor ? Colors.purple : theme.colorScheme.primary;
     final Color colorEvents = _isMulticolor ? Colors.blue : theme.colorScheme.primary;
-    final Color colorBible = _isMulticolor ? const Color(0xFF795548) : theme.colorScheme.primary; // Brown/Teal
+    final Color colorBible = _isMulticolor ? const Color(0xFF795548) : theme.colorScheme.primary; 
 
     return BlocBuilder<DashboardBloc, DashboardState>(
-      builder: (context, state) {
-        return Scaffold(
-          floatingActionButton: FloatingActionButton(
-             onPressed: () {
-               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Asistente IA: Próximamente")));
-             },
-             backgroundColor: theme.cardColor,
-             foregroundColor: theme.colorScheme.primary,
-             elevation: 4,
-             child: const Icon(Icons.auto_awesome_rounded),
-          ),
-          // backgroundColor: Colors.grey[50], // REMOVED to allow Theme to control background (Dark Mode Fix)
-          appBar: AppBar(
-            title: const Text('Redil Dashboard'),
-            centerTitle: true,
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.notifications_outlined),
-                onPressed: () => _showNotificationSheet(context, state),
+      builder: (context, dashboardState) {
+        // SETTINGS: Listen to settings state for dynamic text
+        return BlocBuilder<SettingsBloc, SettingsState>(
+          builder: (context, settingsState) {
+            return Scaffold(
+              floatingActionButton: FloatingActionButton(
+                 onPressed: () {
+                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Asistente IA: Próximamente")));
+                 },
+                 backgroundColor: theme.cardColor,
+                 foregroundColor: theme.colorScheme.primary,
+                 elevation: 4,
+                 child: const Icon(Icons.auto_awesome_rounded),
               ),
-              PopupMenuButton<String>(
-                onSelected: (value) {
-                  if (value == 'appearance') {
-                    _showAppearanceModal(context);
-                  } else if (value == 'backup') {
-                    context.push('/backup');
-                  } else if (value == 'trash') {
-                    context.push('/trash').then((_) {
-                      if (context.mounted) {
-                        context.read<DashboardBloc>().add(const DashboardEvent.loadDashboardData());
+              appBar: AppBar(
+                title: Text(settingsState.churchName), // DYNAMIC: Church Name
+                centerTitle: true,
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    onPressed: () => _showNotificationSheet(context, dashboardState),
+                  ),
+                  PopupMenuButton<String>(
+                    onSelected: (value) {
+                      if (value == 'appearance') {
+                        _showAppearanceModal(context);
+                      } else if (value == 'backup') {
+                        context.push('/backup');
+                      } else if (value == 'trash') {
+                        context.push('/trash').then((_) {
+                          if (context.mounted) {
+                            context.read<DashboardBloc>().add(const DashboardEvent.loadDashboardData());
+                          }
+                        });
                       }
-                    });
-                  }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  const PopupMenuItem<String>(
-                    value: 'appearance',
-                    child: ListTile(
-                      leading: Icon(Icons.palette_outlined),
-                      title: Text('Personalizar'),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'backup',
-                    child: ListTile(
-                      leading: Icon(Icons.save_as_outlined, color: Colors.blue),
-                      title: Text('Copia de Seguridad', style: TextStyle(color: Colors.blue)),
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'trash',
-                    child: ListTile(
-                      leading: Icon(Icons.delete_outline, color: Colors.red),
-                      title: Text('Papelera', style: TextStyle(color: Colors.red)),
-                      contentPadding: EdgeInsets.zero,
-                    ),
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'appearance',
+                        child: ListTile(
+                          leading: Icon(Icons.palette_outlined),
+                          title: Text('Personalizar'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'backup',
+                        child: ListTile(
+                          leading: Icon(Icons.save_as_outlined, color: Colors.blue),
+                          title: Text('Copia de Seguridad', style: TextStyle(color: Colors.blue)),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'trash',
+                        child: ListTile(
+                          leading: Icon(Icons.delete_outline, color: Colors.red),
+                          title: Text('Papelera', style: TextStyle(color: Colors.red)),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
-          ),
-          body: state.maybeWhen(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (activeCount, avgAttendance, lastEventAttendance, lastAttendees, harvestCount, harvestMembers, birthdayMembers, riskMembers) {
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // HEADER: Clean Welcome
-                    Column(
+              body: dashboardState.maybeWhen(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                loaded: (activeCount, avgAttendance, lastEventAttendance, lastAttendees, harvestCount, harvestMembers, birthdayMembers, riskMembers) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Bienvenido, Pastor',
-                          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                        // HEADER: Clean Welcome
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Bienvenido, ${settingsState.userName}', // DYNAMIC: User Name
+                              style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              'Resumen Ministerial',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant, 
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          'Resumen Ministerial',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant, // Theme aware color
-                          ),
+                        const SizedBox(height: 24),
+
+                        // CALENDAR
+                        const DashboardCalendar(),
+                        const SizedBox(height: 24),
+
+                        // MINISTERIAL GRID (3x2)
+                        MinisterialGrid(
+                          // DATA ROW 1
+                          lastEventCount: lastEventAttendance,
+                          riskCount: riskMembers.length,
+                          harvestCount: harvestCount,
+                          // COLORS
+                          colorHeart: colorHeart,
+                          colorShepherd: colorShepherd,
+                          colorHarvest: colorHarvest,
+                          colorMembers: colorMembers,
+                          colorEvents: colorEvents,
+                          colorBible: colorBible,
+                          isMulticolor: _isMulticolor,
+                          // ACTIONS ROW 1 (Modals)
+                          onTapHeart: () => _showAttendeesModal(context, lastAttendees),
+                          onTapShepherd: () => _showRiskModal(context, riskMembers),
+                          onTapHarvest: () => _showHarvestModal(context, harvestMembers),
+                          // ACTIONS ROW 2 (Nav)
+                          onTapMembers: () => context.push('/members'),
+                          onTapEvents: () => context.push('/attendance'),
+                          onTapBible: () => _launchBible(context),
                         ),
+                        
+                        const SizedBox(height: 24),
+
+                        // BIRTHDAYS (Still requested to keep)
+                        if (birthdayMembers.isNotEmpty) ...[
+                          Text('Cumpleaños Próximos', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 12),
+                          _BirthdayCard(members: birthdayMembers),
+                          const SizedBox(height: 24),
+                        ],
+
+                        const SizedBox(height: 48),
                       ],
                     ),
-                    const SizedBox(height: 24),
-
-                    // CALENDAR
-                    const DashboardCalendar(),
-                    const SizedBox(height: 24),
-
-                    // MINISTERIAL GRID (3x2)
-                    MinisterialGrid(
-                      // DATA ROW 1
-                      lastEventCount: lastEventAttendance,
-                      riskCount: riskMembers.length,
-                      harvestCount: harvestCount,
-                      // COLORS
-                      colorHeart: colorHeart,
-                      colorShepherd: colorShepherd,
-                      colorHarvest: colorHarvest,
-                      colorMembers: colorMembers,
-                      colorEvents: colorEvents,
-                      colorBible: colorBible,
-                      isMulticolor: _isMulticolor,
-                      // ACTIONS ROW 1 (Modals)
-                      onTapHeart: () => _showAttendeesModal(context, lastAttendees),
-                      onTapShepherd: () => _showRiskModal(context, riskMembers),
-                      onTapHarvest: () => _showHarvestModal(context, harvestMembers),
-                      // ACTIONS ROW 2 (Nav)
-                      onTapMembers: () => context.push('/members'),
-                      onTapEvents: () => context.push('/attendance'),
-                      onTapBible: () => _launchBible(context),
-                    ),
-                    
-                    const SizedBox(height: 24),
-
-                    // BIRTHDAYS (Still requested to keep)
-                    if (birthdayMembers.isNotEmpty) ...[
-                      Text('Cumpleaños Próximos', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 12),
-                      _BirthdayCard(members: birthdayMembers),
-                      const SizedBox(height: 24),
-                    ],
-
-                    const SizedBox(height: 48),
-                  ],
-                ),
-              );
-            },
-            error: (msg) => Center(child: Text('Error: $msg', style: const TextStyle(color: Colors.red))),
-            orElse: () => const Center(child: CircularProgressIndicator()),
-          ),
+                  );
+                },
+                error: (msg) => Center(child: Text('Error: $msg', style: const TextStyle(color: Colors.red))),
+                orElse: () => const Center(child: CircularProgressIndicator()),
+              ),
+            );
+          }
         );
       },
     );

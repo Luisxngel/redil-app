@@ -34,7 +34,10 @@ class MemberModel {
   
   bool isDeleted;
   bool isHarvested;
-  DateTime? lastContacted; // NEW
+  DateTime? lastContacted;
+  
+  String? photoPath; // NEW
+  String? profession; // NEW
 
   MemberModel({
     this.isarId = Isar.autoIncrement,
@@ -54,6 +57,8 @@ class MemberModel {
     this.isDeleted = false,
     this.isHarvested = false,
     this.lastContacted,
+    this.photoPath,
+    this.profession,
   });
 
   /// Mapper: Entity -> Model
@@ -76,6 +81,8 @@ class MemberModel {
       isDeleted: member.isDeleted,
       isHarvested: member.isHarvested,
       lastContacted: member.lastContacted,
+      photoPath: member.photoPath,
+      profession: member.profession,
     );
   }
 
@@ -100,6 +107,8 @@ class MemberModel {
       isDeleted: isDeleted,
       isHarvested: isHarvested,
       lastContacted: lastContacted,
+      photoPath: photoPath,
+      profession: profession,
     );
   }
 }

@@ -1,294 +1,309 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../../../core/di/injection.dart';
 import '../../domain/entities/member.dart';
 import '../../../../core/utils/enum_extensions.dart';
+import '../bloc/member_form/member_form_bloc.dart';
+import '../bloc/member_form/member_form_event.dart';
+import '../bloc/member_form/member_form_state.dart';
 import '../bloc/members_bloc.dart';
 import '../bloc/members_event.dart';
-import '../bloc/members_state.dart';
 
-class MemberFormPage extends StatefulWidget {
+class MemberFormPage extends StatelessWidget {
   final Member? member;
   const MemberFormPage({super.key, this.member});
 
   @override
-  State<MemberFormPage> createState() => _MemberFormPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => getIt<MemberFormBloc>()..add(MemberFormEvent.initialize(member)),
+      child: const _MemberFormView(),
+    );
+  }
 }
 
-class _MemberFormPageState extends State<MemberFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-  final _notesController = TextEditingController();
-  
-  MemberRole _role = MemberRole.member;
-  MemberStatus _status = MemberStatus.active;
-  CivilStatus _civilStatus = CivilStatus.single;
-  DateTime? _dateOfBirth;
+class _MemberFormView extends StatefulWidget {
+  const _MemberFormView();
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.member != null) {
-      final m = widget.member!;
-      _firstNameController.text = m.firstName;
-      _lastNameController.text = m.lastName;
-      _phoneController.text = m.phone;
-      _addressController.text = m.address ?? '';
-      _notesController.text = m.notes ?? '';
-      _role = m.role;
-      _status = m.status;
-      _civilStatus = m.civilStatus ?? CivilStatus.single;
-      _dateOfBirth = m.dateOfBirth;
-      _civilStatus = m.civilStatus ?? CivilStatus.single;
-      _dateOfBirth = m.dateOfBirth;
-    } else {
-      // Explicitly clear for new member to avoid any retained state issues
-      _firstNameController.clear();
-      _lastNameController.clear();
-      _phoneController.clear();
-      _addressController.clear();
-      _notesController.clear();
-      _role = MemberRole.member;
-      _status = MemberStatus.active;
-      _civilStatus = CivilStatus.single;
-      _dateOfBirth = null;
-    }
-  }
+  State<_MemberFormView> createState() => _MemberFormViewState();
+}
 
-  @override
-  void dispose() {
-    _firstNameController.dispose();
-    _lastNameController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    _notesController.dispose();
-    super.dispose();
-  }
+class _MemberFormViewState extends State<_MemberFormView> {
+  final _picker = ImagePicker();
 
-  void _save() {
-    if (_formKey.currentState?.validate() ?? false) {
-      final firstName = _firstNameController.text.trim();
-      final lastName = _lastNameController.text.trim();
-      final phone = _phoneController.text.trim();
-      final address = _addressController.text.trim().isEmpty ? null : _addressController.text.trim();
-      final notes = _notesController.text.trim().isEmpty ? null : _notesController.text.trim();
-
-      if (widget.member == null) {
-        // --- CREACION: NUEVO ID OBLIGATORIO ---
-        final newId = const Uuid().v4();
-        print('DEBUG: Creating NEW member with ID: $newId');
-
-        final newMember = Member(
-          id: newId,
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone,
-          address: address,
-          role: _role,
-          status: _status,
-          civilStatus: _civilStatus,
-          dateOfBirth: _dateOfBirth,
-          notes: notes,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-          isDeleted: false,
-        );
-        context.read<MembersBloc>().add(MembersEvent.addMember(newMember));
-
-      } else {
-        // --- EDICION: MANTENER ID EXISTENTE ---
-        final existingId = widget.member!.id!;
-        print('DEBUG: Updating EXISTING member with ID: $existingId');
-
-        final updatedMember = Member(
-          id: existingId,
-          firstName: firstName,
-          lastName: lastName,
-          phone: phone,
-          address: address,
-          role: _role,
-          status: _status,
-          civilStatus: _civilStatus,
-          dateOfBirth: _dateOfBirth,
-          notes: notes,
-          createdAt: widget.member!.createdAt,
-          updatedAt: DateTime.now(),
-          isDeleted: widget.member!.isDeleted,
-        );
-        // Repository's saveMember handles upsert, so we reuse AddMember event
-        // (or ideally we'd have an UpdateMember event for clarity, but this works)
-        context.read<MembersBloc>().add(MembersEvent.addMember(updatedMember));
-      }
+  Future<void> _pickImage(BuildContext context) async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null && context.mounted) {
+      context.read<MemberFormBloc>().add(MemberFormEvent.photoChanged(image.path));
     }
   }
   
-  Future<void> _pickDate() async {
+  // Also offer Camera option
+  void _showPhotoOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Cámara'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+                 if (image != null && context.mounted) {
+                   context.read<MemberFormBloc>().add(MemberFormEvent.photoChanged(image.path));
+                 }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Galería'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+                 if (image != null && context.mounted) {
+                   context.read<MemberFormBloc>().add(MemberFormEvent.photoChanged(image.path));
+                 }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _pickDate(BuildContext context, DateTime? currentDate) async {
     final picked = await showDatePicker(
       context: context,
-      initialDate: _dateOfBirth ?? DateTime(2000),
+      initialDate: currentDate ?? DateTime(2000),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    if (picked != null) {
-      setState(() => _dateOfBirth = picked);
+    if (picked != null && context.mounted) {
+      context.read<MemberFormBloc>().add(MemberFormEvent.dateOfBirthChanged(picked));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.member == null ? 'Nuevo Discípulo' : 'Editar Discípulo')),
-      body: BlocListener<MembersBloc, MembersState>(
-        listener: (context, state) {
-          state.whenOrNull(
-            actionSuccess: (message) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(message)),
-              );
-              context.pop();
-            },
-            error: (message) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text(message), backgroundColor: Colors.red),
-              );
-            }
-          );
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                   TextFormField(
-                    controller: _firstNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Nombre',
-                      prefixIcon: Icon(Icons.person),
-                    ),
-                    validator: (v) => v?.isEmpty == true ? 'Requerido' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _lastNameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Apellido',
-                      prefixIcon: Icon(Icons.person_outline),
-                    ),
-                    validator: (v) => v?.isEmpty == true ? 'Requerido' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: 'Teléfono',
-                      prefixIcon: Icon(Icons.phone),
-                    ),
-                    keyboardType: TextInputType.phone,
-                    validator: (v) {
-                       if (v == null || v.isEmpty) return null;
-                       if (!Member.isValidPhone(v)) return 'Formato inválido';
-                       return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Dirección',
-                      prefixIcon: Icon(Icons.place),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  GestureDetector(
-                    onTap: _pickDate,
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        controller: TextEditingController(
-                          text: _dateOfBirth == null 
-                            ? '' 
-                            : DateFormat('dd/MM/yyyy').format(_dateOfBirth!)
+    return BlocConsumer<MemberFormBloc, MemberFormState>(
+      listener: (context, state) {
+         if (state.isSuccess) {
+           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Miembro guardado correctamente')));
+           // Refresh list
+           context.read<MembersBloc>().add(const MembersEvent.loadMembers());
+           context.pop();
+         }
+         if (state.errorMessage != null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red));
+         }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(state.isEditing ? 'Editar Discípulo' : 'Nuevo Discípulo'),
+            actions: [
+              if (state.isSubmitting)
+                const Padding(padding: EdgeInsets.all(16.0), child: CircularProgressIndicator.adaptive())
+              else
+                IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: () => context.read<MemberFormBloc>().add(const MemberFormEvent.submit()),
+                )
+            ],
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // HEADER: Photo
+                Center(
+                  child: GestureDetector(
+                    onTap: () => _showPhotoOptions(context),
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: state.photoPath != null 
+                             ? FileImage(File(state.photoPath!)) 
+                             : null,
+                          backgroundColor: Colors.grey[200],
+                          child: state.photoPath == null 
+                            ? const Icon(Icons.camera_alt, size: 40, color: Colors.grey)
+                            : null,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Fecha de Nacimiento',
-                          prefixIcon: Icon(Icons.calendar_today),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            radius: 16,
+                            backgroundColor: Theme.of(context).primaryColor,
+                            child: const Icon(Icons.edit, size: 16, color: Colors.white),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                
+                // SECTION 1: PERSONAL INFO
+                _SectionTitle('INFORMACIÓN PERSONAL'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: state.firstName,
+                        decoration: const InputDecoration(labelText: 'Nombre', prefixIcon: Icon(Icons.person)),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.firstNameChanged(v)),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: state.lastName,
+                        decoration: const InputDecoration(labelText: 'Apellido', prefixIcon: Icon(Icons.person_outline)),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.lastNameChanged(v)),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => _pickDate(context, state.dateOfBirth),
+                        child: AbsorbPointer(
+                          child: TextFormField(
+                            key: ValueKey(state.dateOfBirth), // Force rebuild to update text
+                            initialValue: state.dateOfBirth != null ? DateFormat('dd/MM/yyyy').format(state.dateOfBirth!) : '',
+                            decoration: const InputDecoration(labelText: 'Fecha Nacimiento', prefixIcon: Icon(Icons.cake)),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<CivilStatus>(
-                    value: _civilStatus,
-                    decoration: const InputDecoration(
-                      labelText: 'Estado Civil',
-                      prefixIcon: Icon(Icons.family_restroom),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<CivilStatus>(
+                        value: state.civilStatus,
+                        decoration: const InputDecoration(labelText: 'Estado Civil', prefixIcon: Icon(Icons.family_restroom)),
+                        items: CivilStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label))).toList(),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.civilStatusChanged(v!)),
+                      ),
                     ),
-                    items: CivilStatus.values.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(status.label),
-                      );
-                    }).toList(),
-                    onChanged: (v) => setState(() => _civilStatus = v!),
-                  ),
-                   const SizedBox(height: 16),
-                  DropdownButtonFormField<MemberRole>(
-                    value: _role,
-                    decoration: const InputDecoration(
-                      labelText: 'Rol',
-                      prefixIcon: Icon(Icons.badge),
+                  ],
+                ),
+                
+                const SizedBox(height: 24),
+                
+                // SECTION 2: CONTACTO Y PROFESIÓN
+                _SectionTitle('CONTACTO Y PROFESIÓN'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: state.phone,
+                        decoration: const InputDecoration(labelText: 'Teléfono', prefixIcon: Icon(Icons.phone)),
+                        keyboardType: TextInputType.phone,
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.phoneChanged(v)),
+                      ),
                     ),
-                    items: MemberRole.values.map((role) {
-                      return DropdownMenuItem(
-                        value: role,
-                        child: Text(role.label.toUpperCase()),
-                      );
-                    }).toList(),
-                    onChanged: (v) => setState(() => _role = v!),
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<MemberStatus>(
-                    value: _status,
-                    decoration: const InputDecoration(
-                      labelText: 'Estado',
-                      prefixIcon: Icon(Icons.check_circle_outline),
+                     const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: state.profession, // NEW FIELD
+                        decoration: const InputDecoration(labelText: 'Profesión', prefixIcon: Icon(Icons.work)),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.professionChanged(v)),
+                      ),
                     ),
-                    items: MemberStatus.values.map((status) {
-                      return DropdownMenuItem(
-                        value: status,
-                        child: Text(status.label.toUpperCase()),
-                      );
-                    }).toList(),
-                    onChanged: (v) => setState(() => _status = v!),
-                  ),
-                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _notesController,
-                    decoration: const InputDecoration(
-                      labelText: 'Notas Pastorales',
-                      prefixIcon: Icon(Icons.notes),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: state.address,
+                  decoration: const InputDecoration(labelText: 'Dirección', prefixIcon: Icon(Icons.place)),
+                  onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.addressChanged(v)),
+                ),
+
+                const SizedBox(height: 24),
+
+                // SECTION 3: ESTATUS ECLESIÁSTICO
+                _SectionTitle('ESTATUS ECLESIÁSTICO'),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<MemberRole>(
+                        value: state.role,
+                        decoration: const InputDecoration(labelText: 'Rol', prefixIcon: Icon(Icons.badge)),
+                        items: MemberRole.values.map((r) => DropdownMenuItem(value: r, child: Text(r.label.toUpperCase()))).toList(),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.roleChanged(v!)),
+                      ),
                     ),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 32),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: _save,
-                      child: const Text('GUARDAR'),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: DropdownButtonFormField<MemberStatus>(
+                        value: state.status,
+                        decoration: const InputDecoration(labelText: 'Estado', prefixIcon: Icon(Icons.check_circle_outline)),
+                        items: MemberStatus.values.map((s) => DropdownMenuItem(value: s, child: Text(s.label.toUpperCase()))).toList(),
+                        onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.statusChanged(v!)),
+                      ),
                     ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // FOOTER: NOTES
+                TextFormField(
+                  initialValue: state.notes,
+                  decoration: const InputDecoration(labelText: 'Notas Pastorales', prefixIcon: Icon(Icons.notes)),
+                  maxLines: 3,
+                  onChanged: (v) => context.read<MemberFormBloc>().add(MemberFormEvent.notesChanged(v)),
+                ),
+                const SizedBox(height: 32),
+                
+                ElevatedButton(
+                  onPressed: state.isSubmitting 
+                    ? null 
+                    : () => context.read<MemberFormBloc>().add(const MemberFormEvent.submit()),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
+                  child: const Text('GUARDAR DATOS'),
+                ),
+                const SizedBox(height: 32),
+              ],
             ),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  const _SectionTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Text(
+        title,
+        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+          color: Theme.of(context).colorScheme.primary,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.0,
         ),
       ),
     );

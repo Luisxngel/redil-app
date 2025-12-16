@@ -82,20 +82,30 @@ const MemberModelSchema = CollectionSchema(
       name: r'phone',
       type: IsarType.string,
     ),
-    r'role': PropertySchema(
+    r'photoPath': PropertySchema(
       id: 13,
+      name: r'photoPath',
+      type: IsarType.string,
+    ),
+    r'profession': PropertySchema(
+      id: 14,
+      name: r'profession',
+      type: IsarType.string,
+    ),
+    r'role': PropertySchema(
+      id: 15,
       name: r'role',
       type: IsarType.byte,
       enumMap: _MemberModelroleEnumValueMap,
     ),
     r'status': PropertySchema(
-      id: 14,
+      id: 16,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MemberModelstatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 15,
+      id: 17,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -163,6 +173,18 @@ int _memberModelEstimateSize(
     }
   }
   bytesCount += 3 + object.phone.length * 3;
+  {
+    final value = object.photoPath;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.profession;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   return bytesCount;
 }
 
@@ -185,9 +207,11 @@ void _memberModelSerialize(
   writer.writeString(offsets[10], object.lastName);
   writer.writeString(offsets[11], object.notes);
   writer.writeString(offsets[12], object.phone);
-  writer.writeByte(offsets[13], object.role.index);
-  writer.writeByte(offsets[14], object.status.index);
-  writer.writeDateTime(offsets[15], object.updatedAt);
+  writer.writeString(offsets[13], object.photoPath);
+  writer.writeString(offsets[14], object.profession);
+  writer.writeByte(offsets[15], object.role.index);
+  writer.writeByte(offsets[16], object.status.index);
+  writer.writeDateTime(offsets[17], object.updatedAt);
 }
 
 MemberModel _memberModelDeserialize(
@@ -211,12 +235,14 @@ MemberModel _memberModelDeserialize(
     lastName: reader.readString(offsets[10]),
     notes: reader.readStringOrNull(offsets[11]),
     phone: reader.readString(offsets[12]),
-    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[13])] ??
+    photoPath: reader.readStringOrNull(offsets[13]),
+    profession: reader.readStringOrNull(offsets[14]),
+    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[15])] ??
         MemberRole.leader,
     status:
-        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[14])] ??
+        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[16])] ??
             MemberStatus.active,
-    updatedAt: reader.readDateTimeOrNull(offsets[15]),
+    updatedAt: reader.readDateTimeOrNull(offsets[17]),
   );
   return object;
 }
@@ -255,12 +281,16 @@ P _memberModelDeserializeProp<P>(
     case 12:
       return (reader.readString(offset)) as P;
     case 13:
+      return (reader.readStringOrNull(offset)) as P;
+    case 14:
+      return (reader.readStringOrNull(offset)) as P;
+    case 15:
       return (_MemberModelroleValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberRole.leader) as P;
-    case 14:
+    case 16:
       return (_MemberModelstatusValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberStatus.active) as P;
-    case 15:
+    case 17:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1843,6 +1873,314 @@ extension MemberModelQueryFilter
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'photoPath',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'photoPath',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'photoPath',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'photoPath',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'photoPath',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'photoPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      photoPathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'photoPath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'profession',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'profession',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'profession',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'profession',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'profession',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'profession',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      professionIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'profession',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> roleEqualTo(
       MemberRole value) {
     return QueryBuilder.apply(this, (query) {
@@ -2194,6 +2532,30 @@ extension MemberModelQuerySortBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByPhotoPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByPhotoPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByProfession() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profession', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByProfessionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profession', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByRole() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'role', Sort.asc);
@@ -2406,6 +2768,30 @@ extension MemberModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByPhotoPath() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByPhotoPathDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'photoPath', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByProfession() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profession', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByProfessionDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'profession', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByRole() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'role', Sort.asc);
@@ -2531,6 +2917,20 @@ extension MemberModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByPhotoPath(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'photoPath', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByProfession(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'profession', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByRole() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'role');
@@ -2635,6 +3035,18 @@ extension MemberModelQueryProperty
   QueryBuilder<MemberModel, String, QQueryOperations> phoneProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'phone');
+    });
+  }
+
+  QueryBuilder<MemberModel, String?, QQueryOperations> photoPathProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'photoPath');
+    });
+  }
+
+  QueryBuilder<MemberModel, String?, QQueryOperations> professionProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'profession');
     });
   }
 

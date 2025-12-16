@@ -17,6 +17,9 @@ import 'features/attendance/presentation/pages/event_attendance_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_page.dart';
 import 'features/settings/presentation/pages/backup_page.dart';
 
+import 'features/settings/presentation/bloc/settings_bloc.dart';
+import 'features/settings/presentation/bloc/settings_event.dart';
+
 import 'features/members/presentation/pages/member_profile_page.dart';
 
 void main() async {
@@ -35,6 +38,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => getIt<MembersBloc>()),
         BlocProvider(create: (_) => getIt<ThemeCubit>()),
+        BlocProvider(create: (_) => getIt<SettingsBloc>()..add(const SettingsEvent.loadSettings())),
       ],
       child: BlocBuilder<ThemeCubit, AppThemeCandidate>(
         builder: (context, themeCandidate) {

@@ -9,4 +9,5 @@ class SettingsEvent with _$SettingsEvent {
     required String userName, 
     required String churchName,
   }) = UpdateIdentity;
+  const factory SettingsEvent.toggleDailyVerse() = ToggleDailyVerse; // NEW
 }

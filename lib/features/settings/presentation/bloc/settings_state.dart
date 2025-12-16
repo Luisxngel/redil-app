@@ -7,6 +7,7 @@ class SettingsState with _$SettingsState {
   const factory SettingsState({
     @Default('Pastor') String userName,
     @Default('Redil Dashboard') String churchName,
+    @Default(false) bool showDailyVerse, // NEW
     @Default(false) bool isLoading,
   }) = _SettingsState;
 }

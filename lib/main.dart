@@ -19,6 +19,7 @@ import 'features/settings/presentation/pages/backup_page.dart';
 
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 import 'features/settings/presentation/bloc/settings_event.dart';
+import 'features/inspiration/presentation/pages/alfoli_page.dart'; // NEW
 
 import 'features/members/presentation/pages/member_profile_page.dart';
 
@@ -117,6 +118,10 @@ final _router = GoRouter(
     GoRoute(
       path: '/backup',
       builder: (context, state) => const BackupPage(),
+    ),
+    GoRoute(
+      path: '/alfoli',
+      builder: (context, state) => const AlfoliPage(),
     ),
   ],
 );

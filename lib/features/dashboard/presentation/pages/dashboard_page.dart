@@ -14,12 +14,15 @@ import 'package:redil/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:redil/features/settings/presentation/bloc/settings_event.dart';
 import 'package:redil/features/settings/presentation/bloc/settings_state.dart';
 import 'package:redil/features/settings/presentation/widgets/identity_dialog.dart';
-import 'package:redil/features/members/domain/entities/member.dart'; 
+import 'package:redil/features/inspiration/presentation/pages/alfoli_page.dart';
+import 'package:redil/features/members/domain/entities/member.dart';  
 import 'package:redil/features/members/domain/entities/member_risk.dart'; 
 import 'package:redil/core/services/statistics_service.dart'; 
 import 'package:redil/features/members/domain/repositories/member_repository.dart'; 
 import '../../../../core/utils/enum_extensions.dart';
 import '../widgets/dashboard_calendar.dart';
+import 'package:redil/features/inspiration/presentation/widgets/daily_verse_card.dart';
+
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -456,6 +459,8 @@ class _DashboardViewState extends State<_DashboardView> {
                             context.read<DashboardBloc>().add(const DashboardEvent.loadDashboardData());
                           }
                         });
+                      } else if (value == 'alfoli') {
+                        context.push('/alfoli');
                       }
                     },
                     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -468,10 +473,18 @@ class _DashboardViewState extends State<_DashboardView> {
                         ),
                       ),
                       const PopupMenuItem<String>(
+                        value: 'alfoli',
+                        child: ListTile(
+                          leading: Icon(Icons.local_library_outlined),
+                          title: Text('Versículos'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      const PopupMenuItem<String>(
                         value: 'backup',
                         child: ListTile(
-                          leading: Icon(Icons.save_as_outlined, color: Colors.blue),
-                          title: Text('Copia de Seguridad', style: TextStyle(color: Colors.blue)),
+                          leading: Icon(Icons.save_as_outlined),
+                          title: Text('Copia de Seguridad'),
                           contentPadding: EdgeInsets.zero,
                         ),
                       ),
@@ -516,7 +529,7 @@ class _DashboardViewState extends State<_DashboardView> {
                         // CALENDAR
                         const DashboardCalendar(),
                         const SizedBox(height: 24),
-
+                        
                         // MINISTERIAL GRID (3x2)
                         MinisterialGrid(
                           // DATA ROW 1
@@ -542,6 +555,12 @@ class _DashboardViewState extends State<_DashboardView> {
                         ),
                         
                         const SizedBox(height: 24),
+
+                        // DAILY VERSE CARD (Conditional)
+                        if (settingsState.showDailyVerse) ...[
+                           const DailyVerseCard(),
+                           const SizedBox(height: 24),
+                        ],
 
                         // BIRTHDAYS (Still requested to keep)
                         if (birthdayMembers.isNotEmpty) ...[

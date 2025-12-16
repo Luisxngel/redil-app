@@ -21,18 +21,21 @@ mixin _$SettingsEvent {
     required TResult Function() loadSettings,
     required TResult Function(String userName, String churchName)
         updateIdentity,
+    required TResult Function() toggleDailyVerse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loadSettings,
     TResult? Function(String userName, String churchName)? updateIdentity,
+    TResult? Function()? toggleDailyVerse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loadSettings,
     TResult Function(String userName, String churchName)? updateIdentity,
+    TResult Function()? toggleDailyVerse,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -40,18 +43,21 @@ mixin _$SettingsEvent {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadSettings value) loadSettings,
     required TResult Function(UpdateIdentity value) updateIdentity,
+    required TResult Function(ToggleDailyVerse value) toggleDailyVerse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadSettings value)? loadSettings,
     TResult? Function(UpdateIdentity value)? updateIdentity,
+    TResult? Function(ToggleDailyVerse value)? toggleDailyVerse,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadSettings value)? loadSettings,
     TResult Function(UpdateIdentity value)? updateIdentity,
+    TResult Function(ToggleDailyVerse value)? toggleDailyVerse,
     required TResult orElse(),
   }) =>
       throw _privateConstructorUsedError;
@@ -116,6 +122,7 @@ class _$LoadSettingsImpl implements LoadSettings {
     required TResult Function() loadSettings,
     required TResult Function(String userName, String churchName)
         updateIdentity,
+    required TResult Function() toggleDailyVerse,
   }) {
     return loadSettings();
   }
@@ -125,6 +132,7 @@ class _$LoadSettingsImpl implements LoadSettings {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loadSettings,
     TResult? Function(String userName, String churchName)? updateIdentity,
+    TResult? Function()? toggleDailyVerse,
   }) {
     return loadSettings?.call();
   }
@@ -134,6 +142,7 @@ class _$LoadSettingsImpl implements LoadSettings {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loadSettings,
     TResult Function(String userName, String churchName)? updateIdentity,
+    TResult Function()? toggleDailyVerse,
     required TResult orElse(),
   }) {
     if (loadSettings != null) {
@@ -147,6 +156,7 @@ class _$LoadSettingsImpl implements LoadSettings {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadSettings value) loadSettings,
     required TResult Function(UpdateIdentity value) updateIdentity,
+    required TResult Function(ToggleDailyVerse value) toggleDailyVerse,
   }) {
     return loadSettings(this);
   }
@@ -156,6 +166,7 @@ class _$LoadSettingsImpl implements LoadSettings {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadSettings value)? loadSettings,
     TResult? Function(UpdateIdentity value)? updateIdentity,
+    TResult? Function(ToggleDailyVerse value)? toggleDailyVerse,
   }) {
     return loadSettings?.call(this);
   }
@@ -165,6 +176,7 @@ class _$LoadSettingsImpl implements LoadSettings {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadSettings value)? loadSettings,
     TResult Function(UpdateIdentity value)? updateIdentity,
+    TResult Function(ToggleDailyVerse value)? toggleDailyVerse,
     required TResult orElse(),
   }) {
     if (loadSettings != null) {
@@ -257,6 +269,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
     required TResult Function() loadSettings,
     required TResult Function(String userName, String churchName)
         updateIdentity,
+    required TResult Function() toggleDailyVerse,
   }) {
     return updateIdentity(userName, churchName);
   }
@@ -266,6 +279,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function()? loadSettings,
     TResult? Function(String userName, String churchName)? updateIdentity,
+    TResult? Function()? toggleDailyVerse,
   }) {
     return updateIdentity?.call(userName, churchName);
   }
@@ -275,6 +289,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
   TResult maybeWhen<TResult extends Object?>({
     TResult Function()? loadSettings,
     TResult Function(String userName, String churchName)? updateIdentity,
+    TResult Function()? toggleDailyVerse,
     required TResult orElse(),
   }) {
     if (updateIdentity != null) {
@@ -288,6 +303,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
   TResult map<TResult extends Object?>({
     required TResult Function(LoadSettings value) loadSettings,
     required TResult Function(UpdateIdentity value) updateIdentity,
+    required TResult Function(ToggleDailyVerse value) toggleDailyVerse,
   }) {
     return updateIdentity(this);
   }
@@ -297,6 +313,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(LoadSettings value)? loadSettings,
     TResult? Function(UpdateIdentity value)? updateIdentity,
+    TResult? Function(ToggleDailyVerse value)? toggleDailyVerse,
   }) {
     return updateIdentity?.call(this);
   }
@@ -306,6 +323,7 @@ class _$UpdateIdentityImpl implements UpdateIdentity {
   TResult maybeMap<TResult extends Object?>({
     TResult Function(LoadSettings value)? loadSettings,
     TResult Function(UpdateIdentity value)? updateIdentity,
+    TResult Function(ToggleDailyVerse value)? toggleDailyVerse,
     required TResult orElse(),
   }) {
     if (updateIdentity != null) {
@@ -325,4 +343,113 @@ abstract class UpdateIdentity implements SettingsEvent {
   @JsonKey(ignore: true)
   _$$UpdateIdentityImplCopyWith<_$UpdateIdentityImpl> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$ToggleDailyVerseImplCopyWith<$Res> {
+  factory _$$ToggleDailyVerseImplCopyWith(_$ToggleDailyVerseImpl value,
+          $Res Function(_$ToggleDailyVerseImpl) then) =
+      __$$ToggleDailyVerseImplCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$ToggleDailyVerseImplCopyWithImpl<$Res>
+    extends _$SettingsEventCopyWithImpl<$Res, _$ToggleDailyVerseImpl>
+    implements _$$ToggleDailyVerseImplCopyWith<$Res> {
+  __$$ToggleDailyVerseImplCopyWithImpl(_$ToggleDailyVerseImpl _value,
+      $Res Function(_$ToggleDailyVerseImpl) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$ToggleDailyVerseImpl implements ToggleDailyVerse {
+  const _$ToggleDailyVerseImpl();
+
+  @override
+  String toString() {
+    return 'SettingsEvent.toggleDailyVerse()';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$ToggleDailyVerseImpl);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function() loadSettings,
+    required TResult Function(String userName, String churchName)
+        updateIdentity,
+    required TResult Function() toggleDailyVerse,
+  }) {
+    return toggleDailyVerse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function()? loadSettings,
+    TResult? Function(String userName, String churchName)? updateIdentity,
+    TResult? Function()? toggleDailyVerse,
+  }) {
+    return toggleDailyVerse?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function()? loadSettings,
+    TResult Function(String userName, String churchName)? updateIdentity,
+    TResult Function()? toggleDailyVerse,
+    required TResult orElse(),
+  }) {
+    if (toggleDailyVerse != null) {
+      return toggleDailyVerse();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(LoadSettings value) loadSettings,
+    required TResult Function(UpdateIdentity value) updateIdentity,
+    required TResult Function(ToggleDailyVerse value) toggleDailyVerse,
+  }) {
+    return toggleDailyVerse(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(LoadSettings value)? loadSettings,
+    TResult? Function(UpdateIdentity value)? updateIdentity,
+    TResult? Function(ToggleDailyVerse value)? toggleDailyVerse,
+  }) {
+    return toggleDailyVerse?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(LoadSettings value)? loadSettings,
+    TResult Function(UpdateIdentity value)? updateIdentity,
+    TResult Function(ToggleDailyVerse value)? toggleDailyVerse,
+    required TResult orElse(),
+  }) {
+    if (toggleDailyVerse != null) {
+      return toggleDailyVerse(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class ToggleDailyVerse implements SettingsEvent {
+  const factory ToggleDailyVerse() = _$ToggleDailyVerseImpl;
 }

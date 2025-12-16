@@ -11,28 +11,38 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   SettingsBloc(this._prefs) : super(const SettingsState()) {
     on<LoadSettings>(_onLoadSettings);
     on<UpdateIdentity>(_onUpdateIdentity);
+    on<ToggleDailyVerse>(_onToggleDailyVerse);
   }
 
   void _onLoadSettings(LoadSettings event, Emitter<SettingsState> emit) {
-    // Retaining keys for consistency or switching to user suggested?
-    // User suggested specific keys in the prompt. I will use them to match instructions.
     final userName = _prefs.getString('userName') ?? 'Pastor';
     final churchName = _prefs.getString('churchName') ?? 'Redil Dashboard';
+    final showDailyVerse = _prefs.getBool('showDailyVerse') ?? false; // Default false
     
-    // Using default constructor since State is a single class
-    emit(SettingsState(userName: userName, churchName: churchName, isLoading: false));
+    emit(SettingsState(
+      userName: userName, 
+      churchName: churchName, 
+      showDailyVerse: showDailyVerse,
+      isLoading: false
+    ));
   }
 
   Future<void> _onUpdateIdentity(UpdateIdentity event, Emitter<SettingsState> emit) async {
     emit(state.copyWith(isLoading: true));
-    
     await _prefs.setString('userName', event.userName);
     await _prefs.setString('churchName', event.churchName);
     
-    emit(SettingsState(
+    emit(state.copyWith(
       userName: event.userName,
       churchName: event.churchName,
       isLoading: false,
     ));
+  }
+
+  Future<void> _onToggleDailyVerse(ToggleDailyVerse event, Emitter<SettingsState> emit) async {
+    // No explicit loading state needed for a simple toggle
+    final newValue = !state.showDailyVerse;
+    await _prefs.setBool('showDailyVerse', newValue);
+    emit(state.copyWith(showDailyVerse: newValue));
   }
 }

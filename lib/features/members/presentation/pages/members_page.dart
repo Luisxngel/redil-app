@@ -130,7 +130,8 @@ class _MembersPageState extends State<MembersPage> {
                   roleMembers.sort((a, b) => a.firstName.compareTo(b.firstName));
                   
                   final count = roleMembers.length;
-                  final isExpandedByDefault = role == MemberRole.leader || role == MemberRole.assistant;
+                  // ONLY expand Leaders by default
+                  final isExpandedByDefault = role == MemberRole.leader; 
 
                   return Card(
                     margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -149,7 +150,8 @@ class _MembersPageState extends State<MembersPage> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         title: Text(
-                          '${role.labelPlural.toUpperCase()} ($count)',
+                          // Use labelPlural directly (already Title Case: "Líderes", etc.)
+                          '${role.labelPlural} ($count)',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Theme.of(context).brightness == Brightness.dark 

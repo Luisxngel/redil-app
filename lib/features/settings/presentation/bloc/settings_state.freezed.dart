@@ -18,6 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$SettingsState {
   String get userName => throw _privateConstructorUsedError;
   String get churchName => throw _privateConstructorUsedError;
+  bool get showDailyVerse => throw _privateConstructorUsedError; // NEW
   bool get isLoading => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -31,7 +32,11 @@ abstract class $SettingsStateCopyWith<$Res> {
           SettingsState value, $Res Function(SettingsState) then) =
       _$SettingsStateCopyWithImpl<$Res, SettingsState>;
   @useResult
-  $Res call({String userName, String churchName, bool isLoading});
+  $Res call(
+      {String userName,
+      String churchName,
+      bool showDailyVerse,
+      bool isLoading});
 }
 
 /// @nodoc
@@ -49,6 +54,7 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
   $Res call({
     Object? userName = null,
     Object? churchName = null,
+    Object? showDailyVerse = null,
     Object? isLoading = null,
   }) {
     return _then(_value.copyWith(
@@ -60,6 +66,10 @@ class _$SettingsStateCopyWithImpl<$Res, $Val extends SettingsState>
           ? _value.churchName
           : churchName // ignore: cast_nullable_to_non_nullable
               as String,
+      showDailyVerse: null == showDailyVerse
+          ? _value.showDailyVerse
+          : showDailyVerse // ignore: cast_nullable_to_non_nullable
+              as bool,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -76,7 +86,11 @@ abstract class _$$SettingsStateImplCopyWith<$Res>
       __$$SettingsStateImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String userName, String churchName, bool isLoading});
+  $Res call(
+      {String userName,
+      String churchName,
+      bool showDailyVerse,
+      bool isLoading});
 }
 
 /// @nodoc
@@ -92,6 +106,7 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
   $Res call({
     Object? userName = null,
     Object? churchName = null,
+    Object? showDailyVerse = null,
     Object? isLoading = null,
   }) {
     return _then(_$SettingsStateImpl(
@@ -103,6 +118,10 @@ class __$$SettingsStateImplCopyWithImpl<$Res>
           ? _value.churchName
           : churchName // ignore: cast_nullable_to_non_nullable
               as String,
+      showDailyVerse: null == showDailyVerse
+          ? _value.showDailyVerse
+          : showDailyVerse // ignore: cast_nullable_to_non_nullable
+              as bool,
       isLoading: null == isLoading
           ? _value.isLoading
           : isLoading // ignore: cast_nullable_to_non_nullable
@@ -117,6 +136,7 @@ class _$SettingsStateImpl implements _SettingsState {
   const _$SettingsStateImpl(
       {this.userName = 'Pastor',
       this.churchName = 'Redil Dashboard',
+      this.showDailyVerse = false,
       this.isLoading = false});
 
   @override
@@ -127,11 +147,15 @@ class _$SettingsStateImpl implements _SettingsState {
   final String churchName;
   @override
   @JsonKey()
+  final bool showDailyVerse;
+// NEW
+  @override
+  @JsonKey()
   final bool isLoading;
 
   @override
   String toString() {
-    return 'SettingsState(userName: $userName, churchName: $churchName, isLoading: $isLoading)';
+    return 'SettingsState(userName: $userName, churchName: $churchName, showDailyVerse: $showDailyVerse, isLoading: $isLoading)';
   }
 
   @override
@@ -143,12 +167,15 @@ class _$SettingsStateImpl implements _SettingsState {
                 other.userName == userName) &&
             (identical(other.churchName, churchName) ||
                 other.churchName == churchName) &&
+            (identical(other.showDailyVerse, showDailyVerse) ||
+                other.showDailyVerse == showDailyVerse) &&
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, userName, churchName, isLoading);
+  int get hashCode =>
+      Object.hash(runtimeType, userName, churchName, showDailyVerse, isLoading);
 
   @JsonKey(ignore: true)
   @override
@@ -161,6 +188,7 @@ abstract class _SettingsState implements SettingsState {
   const factory _SettingsState(
       {final String userName,
       final String churchName,
+      final bool showDailyVerse,
       final bool isLoading}) = _$SettingsStateImpl;
 
   @override
@@ -168,6 +196,8 @@ abstract class _SettingsState implements SettingsState {
   @override
   String get churchName;
   @override
+  bool get showDailyVerse;
+  @override // NEW
   bool get isLoading;
   @override
   @JsonKey(ignore: true)

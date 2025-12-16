@@ -49,8 +49,12 @@ class _AttendanceHistoryView extends StatelessWidget {
         builder: (context, state) {
           return state.maybeWhen(
             loading: () => const Center(child: CircularProgressIndicator()),
-            historyLoaded: (history, scheduled) {
-              if (history.isEmpty && scheduled.isEmpty) {
+            historyLoaded: (fullHistory, scheduled) {
+              // FIX: Filter duplicates. fullHistory contains ALL events (for Calendar). 
+              // We only want PAST events here.
+              final pastHistory = fullHistory.where((e) => e.date.isBefore(DateTime.now())).toList();
+
+              if (pastHistory.isEmpty && scheduled.isEmpty) {
                 return const Center(child: Text('No hay eventos registrados'));
               }
               
@@ -126,7 +130,7 @@ class _AttendanceHistoryView extends StatelessWidget {
                     ],
 
                     // 2. History Section
-                    if (history.isNotEmpty) ...[
+                    if (pastHistory.isNotEmpty) ...[
                        Padding(
                         padding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
                         child: Text(
@@ -138,9 +142,9 @@ class _AttendanceHistoryView extends StatelessWidget {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         padding: const EdgeInsets.symmetric(horizontal: 8),
-                        itemCount: history.length,
+                        itemCount: pastHistory.length,
                         itemBuilder: (context, index) {
-                          final event = history[index];
+                          final event = pastHistory[index];
                           return Card(
                             elevation: 1,
                             margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),

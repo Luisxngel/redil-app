@@ -14,6 +14,7 @@ import '../../../members/domain/entities/member.dart';
 import '../../../members/domain/entities/member_risk.dart'; 
 import '../../../../core/services/statistics_service.dart'; // NEW
 import '../../../members/domain/repositories/member_repository.dart'; // NEW for Actions
+import '../../../../core/utils/enum_extensions.dart';
 import '../widgets/dashboard_calendar.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -106,7 +107,7 @@ class _DashboardViewState extends State<_DashboardView> {
                 child: Text((member.firstName ?? '-')[0], style: TextStyle(color: Theme.of(context).colorScheme.primary)),
               ),
               title: Text('${member.firstName ?? 'Sin Nombre'} ${member.lastName ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(member.role.name.toUpperCase(), style: const TextStyle(fontSize: 10)),
+              subtitle: Text(member.role.label.toUpperCase(), style: const TextStyle(fontSize: 10)),
               onTap: () => _showMemberDetail(context, member),
             );
           },
@@ -427,7 +428,16 @@ class _DashboardViewState extends State<_DashboardView> {
     return BlocBuilder<DashboardBloc, DashboardState>(
       builder: (context, state) {
         return Scaffold(
-          backgroundColor: Colors.grey[50],
+          floatingActionButton: FloatingActionButton(
+             onPressed: () {
+               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Asistente IA: Próximamente")));
+             },
+             backgroundColor: theme.cardColor,
+             foregroundColor: theme.colorScheme.primary,
+             elevation: 4,
+             child: const Icon(Icons.auto_awesome_rounded),
+          ),
+          // backgroundColor: Colors.grey[50], // REMOVED to allow Theme to control background (Dark Mode Fix)
           appBar: AppBar(
             title: const Text('Redil Dashboard'),
             centerTitle: true,
@@ -440,6 +450,8 @@ class _DashboardViewState extends State<_DashboardView> {
                 onSelected: (value) {
                   if (value == 'appearance') {
                     _showAppearanceModal(context);
+                  } else if (value == 'backup') {
+                    context.push('/backup');
                   } else if (value == 'trash') {
                     context.push('/trash').then((_) {
                       if (context.mounted) {
@@ -454,6 +466,14 @@ class _DashboardViewState extends State<_DashboardView> {
                     child: ListTile(
                       leading: Icon(Icons.palette_outlined),
                       title: Text('Personalizar'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'backup',
+                    child: ListTile(
+                      leading: Icon(Icons.save_as_outlined, color: Colors.blue),
+                      title: Text('Copia de Seguridad', style: TextStyle(color: Colors.blue)),
                       contentPadding: EdgeInsets.zero,
                     ),
                   ),
@@ -487,7 +507,9 @@ class _DashboardViewState extends State<_DashboardView> {
                         ),
                         Text(
                           'Resumen Ministerial',
-                          style: theme.textTheme.bodyMedium?.copyWith(color: Colors.grey),
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant, // Theme aware color
+                          ),
                         ),
                       ],
                     ),
@@ -554,10 +576,11 @@ class _DashboardViewState extends State<_DashboardView> {
             child: Row(
                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                children: [
-                 _ThemeOption(color: const Color(0xFF00897B), label: 'Teal', candidate: AppThemeCandidate.teal),
-                 _ThemeOption(color: const Color(0xFF1565C0), label: 'Blue', candidate: AppThemeCandidate.blue),
-                 _ThemeOption(color: const Color(0xFF6A1B9A), label: 'Purple', candidate: AppThemeCandidate.purple),
-                 _ThemeOption(color: Colors.black, label: 'Dark', candidate: AppThemeCandidate.dark),
+                 _ThemeOption(color: const Color(0xFF1565C0), label: 'Azul', candidate: AppThemeCandidate.blue),
+                 _ThemeOption(color: const Color(0xFF00897B), label: 'Turquesa', candidate: AppThemeCandidate.teal),
+                 _ThemeOption(color: const Color(0xFF6A1B9A), label: 'Púrpura', candidate: AppThemeCandidate.purple),
+                 _ThemeOption(color: Colors.deepOrange, label: 'Naranja', candidate: AppThemeCandidate.orange),
+                 _ThemeOption(color: const Color(0xFF1E1E1E), label: 'Oscuro', candidate: AppThemeCandidate.dark),
                ],
             ),
           ),
@@ -625,7 +648,7 @@ class _MemberDetailContent extends StatelessWidget {
                        crossAxisAlignment: CrossAxisAlignment.start,
                        children: [
                          Text('${member.firstName ?? 'Sin Nombre'} ${member.lastName ?? ''}', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-                         Text(member.role.name.toUpperCase(), style: Theme.of(context).textTheme.bodySmall),
+                         Text(member.role.label.toUpperCase(), style: Theme.of(context).textTheme.bodySmall),
                        ],
                      ),
                    ),
@@ -805,7 +828,7 @@ class MinisterialGrid extends StatelessWidget {
               child: _PastoralCard(
                 icon: Icons.groups_rounded,
                 value: null,
-                label: 'Miembros',
+                label: 'Discípulos',
                 color: colorMembers,
                 isMulticolor: isMulticolor,
                 onTap: onTapMembers,
@@ -861,13 +884,35 @@ class _PastoralCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // Design: White background if multicolor, else theme surface variant
-    final bgColor = isMulticolor ? Colors.white : theme.colorScheme.surfaceVariant.withOpacity(0.5);
-    final borderColor = isMulticolor ? Colors.transparent : theme.colorScheme.outlineVariant.withOpacity(0.5);
-    // Shadow only if white background to make it pop
-    final List<BoxShadow>? shadows = isMulticolor 
+    final isDark = theme.brightness == Brightness.dark;
+
+    // BACKGROUND:
+    // Dark Mode: Always use specific Dark Grey (#1E1E1E) for uniformity
+    // Light Mode: White if multicolor, else semitransparent surface variant
+    final bgColor = isDark 
+        ? const Color(0xFF1E1E1E) 
+        : (isMulticolor ? Colors.white : theme.colorScheme.surfaceVariant.withOpacity(0.5));
+
+    // BORDER:
+    // Dark Mode: Subtle grey border
+    // Light Mode: Transparent if multicolor, else outline variant
+    final borderColor = isDark 
+        ? Colors.white12 // Very subtle in dark mode
+        : (isMulticolor ? Colors.transparent : theme.colorScheme.outlineVariant.withOpacity(0.5));
+
+    // SHADOW:
+    // Only in Light Mode + Multicolor
+    final List<BoxShadow>? shadows = (!isDark && isMulticolor) 
        ? [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 8, offset: const Offset(0, 4))]
        : null;
+
+    // ICON & LABEL COLOR:
+    // Priority: Multicolor Setting > Theme Mode
+    // If Multicolor is ON: Use Semantic Color (Red, Green, etc.)
+    // If Multicolor is OFF: Use Theme Primary Color (Vibrant)
+    final effectiveColor = isMulticolor 
+        ? color 
+        : theme.colorScheme.primary;
 
     return InkWell(
       onTap: onTap,
@@ -884,14 +929,15 @@ class _PastoralCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(icon, color: effectiveColor, size: 28),
             const SizedBox(height: 8),
             if (value != null) ...[
               Text(
                 value!,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: color,
+                  // Value stays White in Dark Mode (TitleLarge default), Semantic Color in Light/Multicolor
+                  color: isDark ? null : (isMulticolor ? color : theme.textTheme.bodyLarge?.color),
                   height: 1.0,
                 ),
               ),
@@ -903,7 +949,7 @@ class _PastoralCard extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+                color: effectiveColor, // Unified color
                 fontSize: 10,
                 height: 1.2,
               ),
@@ -956,9 +1002,12 @@ class _BirthdayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Card(
       elevation: 0,
-      color: Colors.white,
+      // color: Colors.white, // REMOVED to allow Theme to control background
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -967,11 +1016,24 @@ class _BirthdayCard extends StatelessWidget {
              final dob = member.dateOfBirth;
              final dateStr = dob != null ? DateFormat('d MMM', 'es').format(dob) : '';
              return ListTile(
-               leading: CircleAvatar(
-                 backgroundColor: Colors.pink[50],
-                 child: const Icon(Icons.cake, color: Colors.pink, size: 20),
+               leading: Container(
+                 padding: const EdgeInsets.all(8),
+                 decoration: BoxDecoration(
+                   // Background of the icon circle: Dark grey in dark mode, Pink[50] in light
+                   color: isDark ? Colors.grey[800] : Colors.pink[50],
+                   shape: BoxShape.circle,
+                 ),
+                 child: Icon(
+                   Icons.cake,
+                   // Icon Color: Primary Theme Color in Dark Mode (Vibrant), Pink in Light
+                   color: isDark ? theme.colorScheme.primary : Colors.pink, 
+                   size: 20,
+                 ),
                ),
-               title: Text('${member.firstName ?? 'Sin Nombre'} ${member.lastName ?? ''}', style: const TextStyle(fontWeight: FontWeight.bold)),
+               title: Text(
+                 '${member.firstName ?? 'Sin Nombre'} ${member.lastName ?? ''}', 
+                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+               ),
                subtitle: Text(dateStr),
                contentPadding: EdgeInsets.zero,
                visualDensity: VisualDensity.compact,
@@ -1010,11 +1072,27 @@ void _showNotificationSheet(BuildContext context, DashboardState state) {
                   ),
                 if (birthdayMembers.isNotEmpty)
                   ListTile(
-                    leading: const Icon(Icons.cake, color: Colors.pink),
-                    title: const Text('Cumpleaños'),
-                    subtitle: Text('Hay ${birthdayMembers.length} cumpleaños esta semana.'),
-                     onTap: () {
-                      Navigator.pop(context);
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(color: Colors.pink[50], shape: BoxShape.circle),
+                      child: const Icon(Icons.cake, color: Colors.pink),
+                    ),
+                    title: const Text("Cumpleaños", style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Hay ${birthdayMembers.length} cumpleaños pendientes esta semana.'),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                    onTap: () async {
+                      // Generic WhatsApp URL to open the app
+                      final Uri whatsappUrl = Uri.parse("https://wa.me/"); 
+                      
+                      if (await canLaunchUrl(whatsappUrl)) {
+                        await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("No se pudo abrir WhatsApp")),
+                          );
+                        }
+                      }
                     },
                   ),
                 if (riskMembers.isEmpty && birthdayMembers.isEmpty)

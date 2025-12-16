@@ -14,12 +14,27 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
   AttendanceRepositoryImpl(this._isar);
 
   @override
-  Stream<List<Attendance>> getHistory() async* {
-    yield* _isar.attendanceModels
+  Stream<List<Attendance>> getHistory({DateTime? start, DateTime? end}) async* {
+    print("🔥🔥 REPO: Iniciando getHistory... 🔥🔥");
+    
+    // 1. WATCH THE QUERY
+    // We remove ALL filters. We just want to see what is in the DB.
+    final stream = _isar.attendanceModels
         .where()
         .sortByDateDesc()
-        .watch(fireImmediately: true)
-        .map((models) => models.map((e) => e.toEntity()).toList());
+        .watch(fireImmediately: true);
+
+    // 2. INTERCEPT THE STREAM TO DEBUG
+    yield* stream.map((models) {
+      print("🔥🔥 REPO: Isar encontró ${models.length} registros en TOTAL 🔥🔥");
+      for (var m in models) {
+        print("   -> ID: ${m.id} | Evento: ${m.date}"); 
+      }
+      
+      // 3. CONVERT TO ENTITIES
+      final entities = models.map((e) => e.toEntity()).toList();
+      return entities;
+    });
   }
 
   @override
@@ -62,6 +77,18 @@ class AttendanceRepositoryImpl implements AttendanceRepository {
       return const Right(null);
     } catch (e) {
       return Left(DatabaseFailure('Error deleting attendance: $e'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> wipeData() async {
+    try {
+      await _isar.writeTxn(() async {
+        await _isar.attendanceModels.clear();
+      });
+      return const Right(null);
+    } catch (e) {
+      return Left(DatabaseFailure('Error wiping attendance data: $e'));
     }
   }
 }

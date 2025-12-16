@@ -17,19 +17,20 @@ import '../../features/attendance/data/repositories/attendance_repository_impl.d
 import '../../features/attendance/domain/repositories/attendance_repository.dart'
     as _i10;
 import '../../features/attendance/presentation/bloc/attendance_bloc.dart'
-    as _i14;
-import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart' as _i15;
+    as _i15;
+import '../../features/dashboard/presentation/bloc/dashboard_bloc.dart' as _i16;
 import '../../features/members/data/repositories/member_repository_impl.dart'
     as _i7;
 import '../../features/members/domain/repositories/member_repository.dart'
     as _i6;
-import '../../features/members/presentation/bloc/members_bloc.dart' as _i12;
+import '../../features/members/presentation/bloc/members_bloc.dart' as _i13;
+import '../../features/settings/services/backup_service.dart' as _i12;
 import '../providers/date_time_provider.dart' as _i4;
 import '../services/communication_service.dart' as _i3;
 import '../services/pdf_service.dart' as _i8;
-import '../services/statistics_service.dart' as _i13;
+import '../services/statistics_service.dart' as _i14;
 import '../theme/theme_cubit.dart' as _i9;
-import 'injection.dart' as _i16;
+import 'injection.dart' as _i17;
 
 extension GetItInjectableX on _i1.GetIt {
 // initializes the registration of main-scope dependencies inside of GetIt
@@ -56,26 +57,30 @@ extension GetItInjectableX on _i1.GetIt {
     gh.singleton<_i9.ThemeCubit>(() => _i9.ThemeCubit());
     gh.lazySingleton<_i10.AttendanceRepository>(
         () => _i11.AttendanceRepositoryImpl(gh<_i5.Isar>()));
-    gh.factory<_i12.MembersBloc>(() => _i12.MembersBloc(
+    gh.lazySingleton<_i12.BackupService>(() => _i12.BackupService(
           gh<_i6.MemberRepository>(),
           gh<_i10.AttendanceRepository>(),
         ));
-    gh.lazySingleton<_i13.StatisticsService>(() => _i13.StatisticsService(
+    gh.factory<_i13.MembersBloc>(() => _i13.MembersBloc(
+          gh<_i6.MemberRepository>(),
+          gh<_i10.AttendanceRepository>(),
+        ));
+    gh.lazySingleton<_i14.StatisticsService>(() => _i14.StatisticsService(
           gh<_i6.MemberRepository>(),
           gh<_i10.AttendanceRepository>(),
           gh<_i4.IDateTimeProvider>(),
         ));
-    gh.factory<_i14.AttendanceBloc>(() => _i14.AttendanceBloc(
+    gh.factory<_i15.AttendanceBloc>(() => _i15.AttendanceBloc(
           gh<_i10.AttendanceRepository>(),
           gh<_i6.MemberRepository>(),
           gh<_i4.IDateTimeProvider>(),
         ));
-    gh.factory<_i15.DashboardBloc>(() => _i15.DashboardBloc(
-          gh<_i13.StatisticsService>(),
+    gh.factory<_i16.DashboardBloc>(() => _i16.DashboardBloc(
+          gh<_i14.StatisticsService>(),
           gh<_i10.AttendanceRepository>(),
         ));
     return this;
   }
 }
 
-class _$IsarModule extends _i16.IsarModule {}
+class _$IsarModule extends _i17.IsarModule {}

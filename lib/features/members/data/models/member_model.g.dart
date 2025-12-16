@@ -62,35 +62,40 @@ const MemberModelSchema = CollectionSchema(
       name: r'lastAttendanceDate',
       type: IsarType.dateTime,
     ),
-    r'lastName': PropertySchema(
+    r'lastContacted': PropertySchema(
       id: 9,
+      name: r'lastContacted',
+      type: IsarType.dateTime,
+    ),
+    r'lastName': PropertySchema(
+      id: 10,
       name: r'lastName',
       type: IsarType.string,
     ),
     r'notes': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'notes',
       type: IsarType.string,
     ),
     r'phone': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'phone',
       type: IsarType.string,
     ),
     r'role': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'role',
       type: IsarType.byte,
       enumMap: _MemberModelroleEnumValueMap,
     ),
     r'status': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'status',
       type: IsarType.byte,
       enumMap: _MemberModelstatusEnumValueMap,
     ),
     r'updatedAt': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -176,12 +181,13 @@ void _memberModelSerialize(
   writer.writeBool(offsets[6], object.isDeleted);
   writer.writeBool(offsets[7], object.isHarvested);
   writer.writeDateTime(offsets[8], object.lastAttendanceDate);
-  writer.writeString(offsets[9], object.lastName);
-  writer.writeString(offsets[10], object.notes);
-  writer.writeString(offsets[11], object.phone);
-  writer.writeByte(offsets[12], object.role.index);
-  writer.writeByte(offsets[13], object.status.index);
-  writer.writeDateTime(offsets[14], object.updatedAt);
+  writer.writeDateTime(offsets[9], object.lastContacted);
+  writer.writeString(offsets[10], object.lastName);
+  writer.writeString(offsets[11], object.notes);
+  writer.writeString(offsets[12], object.phone);
+  writer.writeByte(offsets[13], object.role.index);
+  writer.writeByte(offsets[14], object.status.index);
+  writer.writeDateTime(offsets[15], object.updatedAt);
 }
 
 MemberModel _memberModelDeserialize(
@@ -201,15 +207,16 @@ MemberModel _memberModelDeserialize(
     isHarvested: reader.readBoolOrNull(offsets[7]) ?? false,
     isarId: id,
     lastAttendanceDate: reader.readDateTimeOrNull(offsets[8]),
-    lastName: reader.readString(offsets[9]),
-    notes: reader.readStringOrNull(offsets[10]),
-    phone: reader.readString(offsets[11]),
-    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[12])] ??
+    lastContacted: reader.readDateTimeOrNull(offsets[9]),
+    lastName: reader.readString(offsets[10]),
+    notes: reader.readStringOrNull(offsets[11]),
+    phone: reader.readString(offsets[12]),
+    role: _MemberModelroleValueEnumMap[reader.readByteOrNull(offsets[13])] ??
         MemberRole.leader,
     status:
-        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[13])] ??
+        _MemberModelstatusValueEnumMap[reader.readByteOrNull(offsets[14])] ??
             MemberStatus.active,
-    updatedAt: reader.readDateTimeOrNull(offsets[14]),
+    updatedAt: reader.readDateTimeOrNull(offsets[15]),
   );
   return object;
 }
@@ -240,18 +247,20 @@ P _memberModelDeserializeProp<P>(
     case 8:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 10:
-      return (reader.readStringOrNull(offset)) as P;
-    case 11:
       return (reader.readString(offset)) as P;
+    case 11:
+      return (reader.readStringOrNull(offset)) as P;
     case 12:
+      return (reader.readString(offset)) as P;
+    case 13:
       return (_MemberModelroleValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberRole.leader) as P;
-    case 13:
+    case 14:
       return (_MemberModelstatusValueEnumMap[reader.readByteOrNull(offset)] ??
           MemberStatus.active) as P;
-    case 14:
+    case 15:
       return (reader.readDateTimeOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1344,6 +1353,80 @@ extension MemberModelQueryFilter
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'lastContacted',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'lastContacted',
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'lastContacted',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'lastContacted',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'lastContacted',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition>
+      lastContactedBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'lastContacted',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterFilterCondition> lastNameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -2062,6 +2145,19 @@ extension MemberModelQuerySortBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByLastContacted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastContacted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy>
+      sortByLastContactedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastContacted', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> sortByLastName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.asc);
@@ -2261,6 +2357,19 @@ extension MemberModelQuerySortThenBy
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByLastContacted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastContacted', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MemberModel, MemberModel, QAfterSortBy>
+      thenByLastContactedDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'lastContacted', Sort.desc);
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QAfterSortBy> thenByLastName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'lastName', Sort.asc);
@@ -2395,6 +2504,12 @@ extension MemberModelQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByLastContacted() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'lastContacted');
+    });
+  }
+
   QueryBuilder<MemberModel, MemberModel, QDistinct> distinctByLastName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -2495,6 +2610,13 @@ extension MemberModelQueryProperty
       lastAttendanceDateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'lastAttendanceDate');
+    });
+  }
+
+  QueryBuilder<MemberModel, DateTime?, QQueryOperations>
+      lastContactedProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'lastContacted');
     });
   }
 

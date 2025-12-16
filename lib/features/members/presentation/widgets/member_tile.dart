@@ -50,7 +50,7 @@ class MemberTile extends StatelessWidget {
                   member.firstName.substring(0, 1).toUpperCase(),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Theme.of(context).primaryColor,
                   ),
                 ),
               ),

@@ -15,6 +15,7 @@ import 'features/attendance/presentation/pages/attendance_history_page.dart';
 import 'features/attendance/presentation/pages/attendance_form_page.dart';
 import 'features/attendance/presentation/pages/event_attendance_page.dart';
 import 'features/dashboard/presentation/pages/dashboard_page.dart';
+import 'features/settings/presentation/pages/backup_page.dart';
 
 import 'features/members/presentation/pages/member_profile_page.dart';
 
@@ -108,6 +109,10 @@ final _router = GoRouter(
         final id = state.extra as String;
         return EventAttendancePage(attendanceId: id);
       },
+    ),
+    GoRoute(
+      path: '/backup',
+      builder: (context, state) => const BackupPage(),
     ),
   ],
 );

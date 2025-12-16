@@ -30,20 +30,26 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
 
   Future<void> _onLoadHistory(LoadHistory event, Emitter<AttendanceState> emit) async {
     emit(const AttendanceState.loading());
+    
+    final now = _timeProvider.now;
+    final startOfYear = DateTime(now.year, 1, 1);
+    final endOfYear = DateTime(now.year, 12, 31, 23, 59, 59);
+    print("DEBUG BLOC: Init LoadHistory. Range: $startOfYear TO $endOfYear");
+
     await emit.forEach(
-      _checkRepo.getHistory(),
+      _checkRepo.getHistory(start: startOfYear, end: endOfYear),
       onData: (history) {
+        
+        // FIX: DO NOT FILTER. Pass FULL history to the state so Calendar receives everything.
+        // We still calculate 'scheduled' for the separate view, but 'history' now contains EVERYTHING.
+        print("🔥🔥 BLOC: Emitiendo ${history.length} eventos (Pasado + Futuro) para el Calendario 🔥🔥");
+
+        // 2. Group Future Events (Keep this logic for Key Metrics or Scheduled View)
         final now = _timeProvider.now;
-        
-        // 1. Split Past vs Future
-        final pastEvents = history.where((e) => e.date.isBefore(now)).toList();
         final futureEvents = history.where((e) => e.date.isAfter(now) || e.date.isAtSameMomentAs(now)).toList();
-        
-        // 2. Group Future Events
         final Map<String, List<Attendance>> groups = {};
         
         for (var event in futureEvents) {
-          // If seriesId is present, use it. Otherwise use the event's own ID as unique key.
           final key = event.seriesId ?? event.id;
           if (!groups.containsKey(key)) {
             groups[key] = [];
@@ -51,35 +57,22 @@ class AttendanceBloc extends Bloc<AttendanceEvent, AttendanceState> {
           groups[key]!.add(event);
         }
         
-        // 3. Create AttendanceGroups
         final List<AttendanceGroup> scheduledGroups = [];
-        
         groups.forEach((key, events) {
           if (events.isEmpty) return;
-          
-          // Sort by date ASC to find the main (next) event
           events.sort((a, b) => a.date.compareTo(b.date));
-          
           final mainEvent = events.first;
-          final isRecurring = events.length > 1 || (mainEvent.seriesId != null); // Logic: if grouped by series OR explicitly marked
-          // Better logic: if seriesId is not null, it's recurring conceptually. 
-          // But strict grouping:
-          
           scheduledGroups.add(AttendanceGroup(
             mainEvent: mainEvent,
             count: events.length,
             isRecurring: mainEvent.seriesId != null, 
           ));
         });
-        
-        // 4. Sort Groups by Main Event Date
         scheduledGroups.sort((a, b) => a.mainEvent.date.compareTo(b.mainEvent.date));
         
-        // 5. Sort History by Date DESC (Standard)
-        pastEvents.sort((a, b) => b.date.compareTo(a.date));
-
+        // 3. Emit Loaded with FULL history
         return AttendanceState.historyLoaded(
-          history: pastEvents, 
+          history: history, // PASS EVERYTHING
           scheduled: scheduledGroups
         );
       },

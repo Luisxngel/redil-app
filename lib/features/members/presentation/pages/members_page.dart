@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:grouped_list/grouped_list.dart';
 import '../../domain/entities/member.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/di/injection.dart';
 import '../../../../core/services/pdf_service.dart';
 import '../../../../core/services/statistics_service.dart';
@@ -33,16 +34,11 @@ class _MembersPageState extends State<MembersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Miembros'),
+        title: const Text('Discípulos'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            tooltip: 'Notificaciones',
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Sin notificaciones nuevas')),
-              );
-            },
+            icon: const Icon(Icons.notifications),
+            onPressed: () => _showNotificationSheet(context),
           ),
           IconButton(
             icon: const Icon(Icons.print),
@@ -156,7 +152,9 @@ class _MembersPageState extends State<MembersPage> {
                           '${role.labelPlural.toUpperCase()} ($count)',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
+                            color: Theme.of(context).brightness == Brightness.dark 
+                                ? const Color(0xFFEEEEEE) 
+                                : Colors.grey[800],
                           ),
                         ),
                         children: roleMembers.map((member) => Padding(
@@ -253,7 +251,7 @@ class _MembersPageState extends State<MembersPage> {
               children: [
                 _ThemeCircle(
                   color: const Color(0xFF00897B),
-                  label: 'Teal',
+                  label: 'Turquesa',
                   isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.teal,
                   onTap: () {
                     context.read<ThemeCubit>().changeTheme(AppThemeCandidate.teal);
@@ -271,7 +269,7 @@ class _MembersPageState extends State<MembersPage> {
                 ),
                 _ThemeCircle(
                   color: const Color(0xFF6A1B9A),
-                  label: 'Violeta',
+                  label: 'Púrpura',
                   isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.purple,
                   onTap: () {
                     context.read<ThemeCubit>().changeTheme(AppThemeCandidate.purple);
@@ -280,7 +278,7 @@ class _MembersPageState extends State<MembersPage> {
                 ),
                 _ThemeCircle(
                   color: Colors.black,
-                  label: 'Dark',
+                  label: 'Oscuro',
                   isSelected: context.read<ThemeCubit>().state == AppThemeCandidate.dark,
                   onTap: () {
                     context.read<ThemeCubit>().changeTheme(AppThemeCandidate.dark);
@@ -289,6 +287,53 @@ class _MembersPageState extends State<MembersPage> {
                 ),
               ],
             ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNotificationSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          height: 250, 
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Notificaciones", style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 20),
+              // The Birthday Item
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: Colors.pink[50], shape: BoxShape.circle),
+                  child: const Icon(Icons.cake, color: Colors.pink),
+                ),
+                title: const Text("Cumpleaños", style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text("Hay cumpleaños pendientes esta semana."),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                onTap: () async {
+                  // WHATSAPP LAUNCHER LOGIC
+                  final Uri whatsappUrl = Uri.parse("https://wa.me/");
+                  if (await canLaunchUrl(whatsappUrl)) {
+                    await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("No se pudo abrir WhatsApp")),
+                      );
+                    }
+                  }
+                },
+              ),
+            ],
           ),
         );
       },

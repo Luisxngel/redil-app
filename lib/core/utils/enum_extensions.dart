@@ -6,9 +6,9 @@ extension MemberRoleX on MemberRole {
       case MemberRole.leader:
         return 'Líder';
       case MemberRole.assistant:
-        return 'Asistente';
+        return 'Servidor';
       case MemberRole.member:
-        return 'Miembro';
+        return 'Discípulo';
       case MemberRole.guest:
         return 'Invitado';
     }
@@ -19,9 +19,9 @@ extension MemberRoleX on MemberRole {
       case MemberRole.leader:
         return 'Líderes';
       case MemberRole.assistant:
-        return 'Asistentes';
+        return 'Servidores';
       case MemberRole.member:
-        return 'Miembros';
+        return 'Discípulos';
       case MemberRole.guest:
         return 'Invitados';
     }

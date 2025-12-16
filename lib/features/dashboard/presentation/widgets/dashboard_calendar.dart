@@ -23,6 +23,14 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
+  DateTime _normalizeDate(DateTime date) {
+    return DateTime.utc(date.year, date.month, date.day);
+  }
+
+  String _getDateKey(DateTime date) {
+    return "${date.year}-${date.month}-${date.day}";
+  }
+
   @override
   Widget build(BuildContext context) {
     // We need Attendance data. 
@@ -43,12 +51,21 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
 
             // Map events to days
             // We need a map for the eventLoader
-            final eventsMap = <DateTime, List<Attendance>>{};
+            final eventsMap = <String, List<Attendance>>{};
+            print("--- INICIO DEBUG CALENDARIO (STRING KEYS) ---");
+            print("Total eventos en la lista: ${allEvents.length}");
+
             for (var event in allEvents) {
-               final date = DateUtils.dateOnly(event.date);
-               if (eventsMap[date] == null) eventsMap[date] = [];
-               eventsMap[date]!.add(event);
+               final key = _getDateKey(event.date);
+               
+               // PRINT EACH EVENT DATE
+               print("Evento: ${event.date} -> Key: $key");
+
+               if (eventsMap[key] == null) eventsMap[key] = [];
+               eventsMap[key]!.add(event);
             }
+            print("Total claves en mapa: ${eventsMap.keys.length}");
+            print("--- FIN DEBUG CALENDARIO ---");
 
             final selectedEvents = _getEventsForDay(_selectedDay ?? _focusedDay, eventsMap);
 
@@ -91,29 +108,30 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
                       },
                       
                       eventLoader: (day) {
-                        return _getEventsForDay(day, eventsMap);
+                        return eventsMap[_getDateKey(day)] ?? [];
                       },
                       
                       // Styling
                       calendarStyle: CalendarStyle(
-                        // 1. TODAY DECORATION: Ring, not solid
+                        // 1. TODAY DECORATION: Ring style (Restored)
                         todayDecoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: Theme.of(context).primaryColor, width: 2.0),
+                          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2.0),
+                          color: Colors.transparent, // No fill
                         ),
-                        // 2. TODAY TEXT STYLE
+                        // 2. TODAY TEXT STYLE: Colored to match border
                         todayTextStyle: TextStyle(
-                          color: Theme.of(context).primaryColor, 
+                          color: Theme.of(context).colorScheme.primary, 
                           fontWeight: FontWeight.bold,
                         ),
-                        // 3. SELECTED DECORATION: Solid fill
+                        // 3. SELECTED DECORATION: Solid fill (Kept as is)
                         selectedDecoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                         // Marker decoration handled below or default
                         markerDecoration: BoxDecoration(
-                          color: Theme.of(context).primaryColor,
+                          color: Theme.of(context).colorScheme.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -121,18 +139,21 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
                       calendarBuilders: CalendarBuilders(
                         markerBuilder: (context, day, events) {
                           if (events.isEmpty) return null;
-                          if (isSameDay(day, _selectedDay)) return const SizedBox(); // Hide if selected
+                          if (isSameDay(day, _selectedDay)) return const SizedBox(); 
                           
                           return Positioned(
                              bottom: 1,
-                             child: Container(
-                               decoration: BoxDecoration(
-                                 shape: BoxShape.circle,
-                                 color: Theme.of(context).primaryColor,
+                             child: Transform.rotate(
+                               angle: 0.785398, // 45 degrees
+                               child: Container(
+                                 width: 6.0,
+                                 height: 6.0,
+                                 decoration: BoxDecoration(
+                                   color: Theme.of(context).colorScheme.primary,
+                                   shape: BoxShape.rectangle,
+                                   borderRadius: BorderRadius.circular(1),
+                                 ),
                                ),
-                               width: 7.0,
-                               height: 7.0,
-                               margin: const EdgeInsets.symmetric(horizontal: 1.5),
                              ),
                            );
                         },
@@ -157,7 +178,7 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
                        title: Text(e.title ?? e.description ?? 'Evento sin nombre'),
                        subtitle: Text(DateFormat('HH:mm').format(e.date)),
                        trailing: const Icon(Icons.chevron_right),
-                       leading: Icon(Icons.event, color: Theme.of(context).primaryColor),
+                       leading: Icon(Icons.calendar_today_rounded, color: Theme.of(context).colorScheme.primary),
                        onTap: () => _showEventBriefing(context, e), // CHANGED
                      ),
                    )),
@@ -169,10 +190,8 @@ class _DashboardCalendarState extends State<DashboardCalendar> {
     );
   }
 
-  List<Attendance> _getEventsForDay(DateTime day, Map<DateTime, List<Attendance>> map) {
-    // Normalize logic
-    final normalized = DateUtils.dateOnly(day);
-    return map[normalized] ?? [];
+  List<Attendance> _getEventsForDay(DateTime day, Map<String, List<Attendance>> map) {
+    return map[_getDateKey(day)] ?? [];
   }
 
   // --- STEP 2: EVENT BRIEFING MODAL ---

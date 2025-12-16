@@ -17,7 +17,7 @@ class MemberProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text('Perfil de Miembro'),
         centerTitle: true,
@@ -139,7 +139,11 @@ class MemberProfilePage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               '${member.firstName} ${member.lastName}',
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -254,10 +258,12 @@ class MemberProfilePage extends StatelessWidget {
              child: Row(
                mainAxisAlignment: MainAxisAlignment.spaceAround,
                children: [
-                 _StatItem(
+                   _StatItem(
                    label: '% Asistencia',
                    value: '${percent.toStringAsFixed(1)}%',
-                   color: Colors.blue,
+                   color: Theme.of(context).brightness == Brightness.dark 
+                       ? const Color(0xFFEEEEEE) 
+                       : const Color(0xFF616161),
                  ),
                  _StatItem(
                    label: 'Eventos',
@@ -319,7 +325,7 @@ class MemberProfilePage extends StatelessWidget {
                 const SizedBox(height: 24),
              ],
 
-             const Text('Historial Reciente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)),
+             Text('Historial Reciente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.grey[300] : Colors.grey[700])),
              const SizedBox(height: 12),
              if (pastEvents.isEmpty)
                const Text('No hay historial pasado.'),

@@ -142,7 +142,7 @@ class _MemberFormPageState extends State<MemberFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.member == null ? 'Nuevo Miembro' : 'Editar Miembro')),
+      appBar: AppBar(title: Text(widget.member == null ? 'Nuevo Discípulo' : 'Editar Discípulo')),
       body: BlocListener<MembersBloc, MembersState>(
         listener: (context, state) {
           state.whenOrNull(
